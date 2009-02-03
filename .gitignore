@@ -1,0 +1,8 @@
+target
+.project
+.classpath
+.settings
+.manager
+.launch
+.svn
+.DS_Store

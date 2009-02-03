@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.scalamodules</groupId>
+  <artifactId>scalamodules.demo.dsl.hello.provider</artifactId>
+  <name>ScalaModules - Demo - DSL - Hello - Provider</name>
+  <packaging>jar</packaging>
+  <version>1.0.0</version>
+
+  <parent>
+    <groupId>org.scalamodules</groupId>
+    <artifactId>pom-bundle-scala</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../../poms/pom-bundle-scala.xml</relativePath>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scalamodules</groupId>
+      <artifactId>scalamodules.dsl.core</artifactId>
+      <version>[1,2)</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Export-Package>org.scalamodules.demo.dsl.hello.provider;version="1.0.0"</Export-Package>
+            <Private-Package>org.scalamodules.demo.dsl.hello.provider.internal</Private-Package>
+            <Bundle-Activator>org.scalamodules.demo.dsl.hello.provider.internal.Activator</Bundle-Activator>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
