@@ -50,6 +50,14 @@ class Activator extends BundleActivator {
       case Some(hellos) => hellos.foreach(println)
     }
 
+    println("getMany withFilter:")
+    context getMany classOf[HelloService] withFilter "(name=*)" andApply {
+      _.hello
+    } match {
+      case None         => println("No HelloServices available!")
+      case Some(hellos) => hellos.foreach(println)
+    }
+
     println("getMany withProperties:")
     context getMany classOf[HelloService] andApplyWithProperties { 
       (helloService, properties) => properties.get("name") match {
