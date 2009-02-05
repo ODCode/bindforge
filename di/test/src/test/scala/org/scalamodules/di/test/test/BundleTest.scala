@@ -56,7 +56,6 @@ class BundleTest extends OSGiTest {
 def testServiceExport() {
     class SimpleModule extends BindingConfig {
       bind[AService] - {
-        exportService
       }
     }
     val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
