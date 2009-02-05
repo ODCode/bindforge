@@ -90,5 +90,18 @@ class SimpleModuleTest {
     assertTrue(client.getMyService.isInstanceOf[MyServiceImpl])
   }
 
+  @Test
+  def testLifeCycleCallback() {
+    class SimpleModule extends BindingConfig {
+      bind[MyServiceImpl] - {
+        lifecycle("init")
+      }
+    }
+    val i = InjectorFactory.createInjector(new SimpleModule())
+
+    val myi = i.getInstance(Key.get(classOf[MyServiceImpl]))
+    assertTrue(myi.initCalled == true)
+  }
+
 
 }

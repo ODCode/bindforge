@@ -34,9 +34,16 @@ class BindingConfig {
     b
   }
 
-  def property(name: String): PropertyInjection = currentBinding.property(name)
+  def lifecycle(init: String) {
+    lifecycle(init, null)
+  }
 
-  def createWithGuice = currentBinding.createWithGuice
+  def lifecycle(init: String, destroy: String) {
+    currentBinding.lifecycle(init, destroy)
+  }
+
+
+  def property(name: String): PropertyInjection = currentBinding.property(name)
 
 }
 

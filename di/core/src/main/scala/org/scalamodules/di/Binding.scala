@@ -18,10 +18,8 @@ extends Bindable[A] {
   
   var toType: Class[_ <: A] = fromType
   var id: String = _
-  val injectionPoints = new ListBuffer[InjectionPoint]
+  val provider = new PojoProvider(this)
 
-  private var _createWithGuice = false
-  
   /**
    * Assign an ID.
    */
@@ -38,13 +36,11 @@ extends Bindable[A] {
   }
 
   def property(name: String): PropertyInjection = {
-    val p = new PropertyInjection(name)
-    injectionPoints += p
-    p
+    provider.addProperty(name)
   }
 
-  def createWithGuice {
-    _createWithGuice = true
+  def lifecycle(init: String, destroy: String) {
+    provider.setInitAndDestroy(init, destroy)
   }
   
   override def create(binder: Binder) {
@@ -60,25 +56,8 @@ extends Bindable[A] {
   
   private def bindTarget[T >: A](binding: LinkedBindingBuilder[T], forceToBinding: Boolean) {
     var bindingTargeted: ScopedBindingBuilder[A] = binding
-
-    if (_createWithGuice) {
-      if (fromType != toType || forceToBinding) {
-        bindingTargeted = binding.to(toType)
-      }
-    }
-    else {
-      bindingTargeted = binding.toProvider(new PojoProvider(toType, injectionPoints))
-    }
+    bindingTargeted = binding.toProvider(provider)
     bindingTargeted.asEagerSingleton()
-
-    /*
-     if (injectionPoints.length > 0)
-     bindingTargeted = binding.toProvider(new PojoProvider(toType, injectionPoints))
-     else if (toType != fromType || forceToBinding)
-     bindingTargeted = binding.to(toType)
-
-     bindingTargeted.asEagerSingleton()
-     */
   }
   
 }

@@ -1,5 +1,6 @@
 package org.scalamodules.di
 
+import scala.collection.mutable.ListBuffer
 import java.lang.reflect.Method
 import com.google.inject._
 import com.google.inject.name._
@@ -37,21 +38,44 @@ class PropertyInjection(name: String) extends InjectionPoint {
   }
 }
 
-class PojoProvider[A <: Object](clazz: Class[A], injectionPoints: Seq[InjectionPoint]) extends Provider[A] {
+class PojoProvider[A <: Object](binding: Binding[A]) extends Provider[A] {
   
   @Inject
   var injector: Injector = _
-  
+
+  private val injectionPoints = new ListBuffer[InjectionPoint]
+
+  var _initMethod: String = _
+  var _destroyMethod: String = _
+
+  def setInitAndDestroy(init: String, destroy: String) {
+    _initMethod = init
+    _destroyMethod = destroy
+  }
+
+  def addProperty(name: String): PropertyInjection = {
+    val p = new PropertyInjection(name)
+    injectionPoints += p
+    p
+  }
+
   def get(): A = {
-    val obj = clazz.newInstance
+    val obj = binding.toType.newInstance
 
     // Default Guice injection mechanism
     injector.injectMembers(obj)
 
     // ScalaModules DI mechanism
-    injectionPoints.foreach(_.inject(clazz, obj, injector))
+    injectionPoints.foreach(_.inject(binding.fromType, obj, injector))
+
+    if (_initMethod != null) {
+      executeInitMethod(obj)
+    }
        
     obj
+  }
+
+  def executeInitMethod(obj: A) {
   }
 
 }

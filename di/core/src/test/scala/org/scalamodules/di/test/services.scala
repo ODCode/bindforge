@@ -6,6 +6,13 @@ trait MyService {
 }
 
 class MyServiceImpl extends MyService {
+
+  var initCalled = false
+
+  def init() {
+    initCalled = true
+  }
+
   def hello() = println("Hello")
 }
 

@@ -19,6 +19,11 @@ import org.scalamodules.di._
 import org.scalamodules.common.integrationtest._
 
 
+class AService {
+
+}
+
+
 @RunWith(classOf[JUnit4TestRunner])
 class BundleTest extends OSGiTest {
 
@@ -46,6 +51,16 @@ class BundleTest extends OSGiTest {
     // use scalatest methods e.g. ===
     assertTrue(pa != null)
     assertTrue(pa.isInstanceOf[PackageAdmin])
+  }
+
+def testServiceExport() {
+    class SimpleModule extends BindingConfig {
+      bind[AService] - {
+        exportService
+      }
+    }
+    val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
+    i
   }
 
 }
