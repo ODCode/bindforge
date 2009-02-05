@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>scalamodules.di.test</artifactId>
+	<packaging>jar</packaging>
+	<name>ScalaModules - DI - Integration Tests</name>
+    <version>1.0.0</version>
+	<parent>
+		<groupId>org.scalamodules</groupId>
+		<artifactId>pom-it-scala</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../../poms/pom-it-scala.xml</relativePath>
+	</parent>
+	<dependencies>
+		<dependency>
+			<groupId>org.scalamodules</groupId>
+			<artifactId>scalamodules.common.integrationtest</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scalamodules</groupId>
+			<artifactId>scalamodules.di</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
+</project>

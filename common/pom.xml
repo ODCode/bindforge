@@ -10,6 +10,7 @@
 
   <modules>
     <module>util</module>
+    <module>integrationtest</module>
   </modules>
 
 </project>
