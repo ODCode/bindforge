@@ -19,6 +19,7 @@
 
 package org.scalamodules.demo.dsl.hello.provider.internal
 
+import java.lang.Integer
 import org.osgi.framework.{BundleActivator, BundleContext}
 import org.scalamodules.demo.dsl.hello.provider.HelloService
 import org.scalamodules.dsl.core.RichBundleContext.fromBundleContext
@@ -27,12 +28,14 @@ class Activator extends BundleActivator {
   
   override def start(context: BundleContext) {
     
+    // Register a service
     var hello = new HelloService { 
       override def hello = "Hello World!"
     }
     context addAs classOf[HelloService] theService hello
 
-    var properties = Map("name" -> "HelloService",
+    // Register a service with properties
+    var properties = Map("name"            -> "HelloService",
                          "service.ranking" -> new Integer("1"))
     var hello2 = new HelloService { 
       override def hello = "Hello World, I have got properties!" 

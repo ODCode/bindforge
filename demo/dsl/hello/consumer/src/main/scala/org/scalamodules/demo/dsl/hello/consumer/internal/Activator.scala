@@ -28,7 +28,8 @@ class Activator extends BundleActivator {
   override def start(context: BundleContext) {
 
     println("getOne:")
-    context getOne classOf[HelloService] andApply { _.hello } match {
+    context getOne classOf[HelloService] andApply { _.hello }
+    match {
       case None    => println("No HelloService available!")
       case Some(s) => println(s)
     }
@@ -39,13 +40,15 @@ class Activator extends BundleActivator {
         case None       => helloService.hello
         case Some(name) => helloService.hello + "; name=" + name
       } 
-    } match {
+    }
+    match {
       case None    => println("No HelloService available!")
       case Some(s) => println(s)
     }
 
     println("getMany:")
-    context getMany classOf[HelloService] andApply { _.hello } match {
+    context getMany classOf[HelloService] andApply { _.hello }
+    match {
       case None         => println("No HelloServices available!")
       case Some(hellos) => hellos.foreach(println)
     }
@@ -53,7 +56,8 @@ class Activator extends BundleActivator {
     println("getMany withFilter:")
     context getMany classOf[HelloService] withFilter "(name=*)" andApply {
       _.hello
-    } match {
+    }
+    match {
       case None         => println("No HelloServices available!")
       case Some(hellos) => hellos.foreach(println)
     }
@@ -64,7 +68,8 @@ class Activator extends BundleActivator {
         case None       => helloService.hello
         case Some(name) => helloService.hello + "; name=" + name
       } 
-    } match {
+    }
+    match {
       case None         => println("No HelloServices available!")
       case Some(hellos) => hellos.foreach(println)
     }
