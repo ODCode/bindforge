@@ -74,6 +74,13 @@
               <goal>bundle</goal>
             </goals>
           </execution>
+          <execution>
+            <id>bundle-install</id>
+            <phase>install</phase>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
     </plugins>
