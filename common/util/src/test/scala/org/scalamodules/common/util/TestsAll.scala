@@ -17,11 +17,30 @@
  * under the License.
  ******************************************************************************/
 
-package org.scalamodules.common.util.jcl
+package org.scalamodules.common.util
 
-object Suite extends org.scalatest.Suite {
+import org.junit.Test
+import org.scalatest._
+import org.scalamodules.common.util.jcl.ConversionsSpec
 
-  def main(args: Array[String]) {
-    (new ConversionsSpec).execute()
+class TestAll {
+  
+  @Test
+  def testAll {
+    val reporter = new Reporter {
+      override def testFailed(report: Report) {
+        println(report.name)
+        println("  " + report.message)
+        report.throwable match {
+          case Some(t) => println("  " + t); throw t
+          case _       =>
+        }
+      }
+    }
+    val suite = new Suite {
+      override def nestedSuites = List(new ConversionsSpec)
+    }
+    suite.execute(None, reporter, new Stopper {}, Set[String](), Set[String](), 
+                  Map[String, Any](), None)
   }
 }
