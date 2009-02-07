@@ -14,7 +14,7 @@ class SimpleModuleTest {
   @Test
   def testSimpleBind() {
     class SimpleModule extends BindingConfig {
-      bind[MyServiceImpl]
+      bind [MyServiceImpl]
     }
     val i = InjectorFactory.createInjector(new SimpleModule())
     
@@ -26,7 +26,7 @@ class SimpleModuleTest {
   @Test
   def testFromAndToType() {
     class SimpleModule extends BindingConfig {
-      bind[MyService, MyServiceImpl]
+      bind [MyService, MyServiceImpl]
     }
         
     val i = InjectorFactory.createInjector(new SimpleModule())
@@ -38,20 +38,35 @@ class SimpleModuleTest {
   @Test
   def testId() {
     class SimpleModule extends BindingConfig {
-      "s1" :: bind[MyServiceImpl]
+      "s1" :: bind [MyServiceImpl]
     }
     val m = new SimpleModule().create()
     val i = Guice.createInjector(m)
-    
+
     val ser = i.getInstance(Key.get(classOf[Object], Names.named("s1")))
     assertTrue(ser != null)
   }
 
   @Test
+  def testInjectValue() {
+    class SimpleModule extends BindingConfig {
+      bind [ServiceWithIntProperty] set {
+        property("intProperty") value 12345
+      }
+    }
+    val m = new SimpleModule().create()
+    val i = Guice.createInjector(m)
+
+    val ser = i.getInstance(Key.get(classOf[ServiceWithIntProperty]))
+    assertTrue(ser != null)
+    assertTrue(ser.getIntProperty == 12345)
+  }
+
+  @Test
   def testInjectionWithInjectAnnotation() {
     class SimpleModule extends BindingConfig {
-      bind[MyService, MyServiceImpl]
-      bind[ClientWithAnnotation]
+      bind [MyService, MyServiceImpl]
+      bind [ClientWithAnnotation]
     }
     val m = new SimpleModule().create()
     val i = Guice.createInjector(m)
@@ -63,8 +78,8 @@ class SimpleModuleTest {
   @Test
   def testInjectionWithBlock() {
     class SimpleModule extends BindingConfig {
-      bind[MyService, MyServiceImpl]
-      bind[ClientWithoutAnnotation] - {
+      bind [MyService, MyServiceImpl]
+      bind [ClientWithoutAnnotation] set {
         property("myService")
       }
     }
@@ -78,9 +93,9 @@ class SimpleModuleTest {
   @Test
   def testInjectionWithBlockKnownName() {
     class SimpleModule extends BindingConfig {
-      "service1" :: bind[MyServiceImpl]
-      bind[ClientWithoutAnnotation] - {
-        property("myService") <-- "service1"
+      "service1" :: bind [MyServiceImpl]
+      bind [ClientWithoutAnnotation] set {
+        property("myService") ref "service1"
       }
     }
     val i = InjectorFactory.createInjector(new SimpleModule())
@@ -91,17 +106,32 @@ class SimpleModuleTest {
   }
 
   @Test
-  def testLifeCycleCallback() {
+  def testInitCallback() {
     class SimpleModule extends BindingConfig {
-      bind[MyServiceImpl] - {
+      bind [MyServiceImpl] set {
         lifecycle("init")
       }
     }
     val i = InjectorFactory.createInjector(new SimpleModule())
 
     val myi = i.getInstance(Key.get(classOf[MyServiceImpl]))
-    //assertTrue(myi.initCalled == true)
-    1
+    assertTrue(myi.initCalled == true)
+  }
+
+  @Test
+  def testInitWrongNameCallback() {
+    class SimpleModule extends BindingConfig {
+      bind [MyServiceImpl] set {
+        lifecycle("init_does_not_exist")
+      }
+    }
+    try {
+      InjectorFactory.createInjector(new SimpleModule())
+      fail("Module creation should have thrown an exception")
+    }
+    catch {
+      case e: Exception =>
+    }
   }
 
 

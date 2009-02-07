@@ -8,19 +8,19 @@ import com.google.inject.binder._
 
 class BindingConfig {
   
-  val bindings = new ListBuffer[Bindable[_]]
+  val bindings = new ListBuffer[Binding[_]]
   var currentBinding: Binding[_] = _
-  
+
   def create(): Module = new Module() {
     def configure(binder: Binder) {
       bindings.foreach(_.create(binder))
     }
   }
   
-  def bind[A <: Object](implicit fromType: Manifest[A]): Binding[A] = bind(fromType, null)
+  def bind[A <: Object](implicit fromType: Manifest[A]): PojoBinding[A] = bind(fromType, null)
 
-  def bind[A <: Object, B <: A](implicit fromType: Manifest[A], toType: Manifest[B]): Binding[A] = {
-    val b = new Binding(this, fromType.erasure.asInstanceOf[Class[A]])
+  def bind[A <: Object, B <: A](implicit fromType: Manifest[A], toType: Manifest[B]): PojoBinding[A] = {
+    val b = new PojoBinding(this, fromType.erasure.asInstanceOf[Class[A]])
     if (toType != null) {
       b.toType = toType.erasure.asInstanceOf[Class[B]]
     }
@@ -29,7 +29,7 @@ class BindingConfig {
   }
 
   def importService[A <: Object](implicit objectClass: Manifest[A]): ServiceBinding[A] = {
-    val b = new ServiceBinding[A](objectClass.erasure.asInstanceOf[Class[A]])
+    val b = new ServiceBinding[A](this, objectClass.erasure.asInstanceOf[Class[A]])
     bindings += b
     b
   }
@@ -42,8 +42,13 @@ class BindingConfig {
     currentBinding.lifecycle(init, destroy)
   }
 
+  def property(name: String): PropertyInjection = {
+    currentBinding.property(name)
+  }
 
-  def property(name: String): PropertyInjection = currentBinding.property(name)
+  def exportService(dict: Tuple2[String, Object]*) {
+    currentBinding.exportService(dict: _*)
+  }
 
 }
 

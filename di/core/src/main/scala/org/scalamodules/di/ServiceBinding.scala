@@ -7,11 +7,13 @@
 package org.scalamodules.di
 
 import com.google.inject.Binder
+import com.google.inject.binder.LinkedBindingBuilder
 import org.ops4j.peaberry.Peaberry._
 import org.ops4j.peaberry.util.Filters.ldap
 
 
-class ServiceBinding[A <: Object](objectClass: Class[A]) extends Bindable[A] {
+class ServiceBinding[A <: Object](bindingConfig: BindingConfig, bindType: Class[A])
+extends Binding[A](bindingConfig, bindType) {
 
   private var _filter: String = null
 
@@ -20,14 +22,13 @@ class ServiceBinding[A <: Object](objectClass: Class[A]) extends Bindable[A] {
     this
   }
 
-  override def create(binder: Binder) {
+  override def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
     if (_filter != null) {
-      binder.bind(objectClass).toProvider(service(objectClass).filter(ldap(_filter)).single())
+      binding.toProvider(service(bindType).filter(ldap(_filter)).single())
     }
     else {
-      binder.bind(objectClass).toProvider(service(objectClass).single())
+      binding.toProvider(service(bindType).single())
     }
-
   }
 
 }

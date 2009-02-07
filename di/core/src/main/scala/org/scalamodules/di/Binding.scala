@@ -6,19 +6,13 @@ import com.google.inject.binder._
 import com.google.inject.name.Names
 
 
-/**
- * Class to hold binding information.
- *
- * Instances will store information about the types used in bindings,
- * @code{Named} annotations, etc. These information are modified trough
- * a DSL like syntax.
- */
-class Binding[A <: Object](bindingConfig: BindingConfig, var fromType: Class[A])
-extends Bindable[A] {
-  
-  var toType: Class[_ <: A] = fromType
-  var id: String = _
-  val provider = new PojoProvider(this)
+abstract class Binding[A <: Object](bindingConfig: BindingConfig, val bindType: Class[A]) {
+
+  var id: String = null
+
+  var key: Key[_ <: Object] = null
+
+  val nestedBindings = new ListBuffer[Binding[_ <: Object]]
 
   /**
    * Assign an ID.
@@ -28,36 +22,41 @@ extends Bindable[A] {
     this
   }
 
-  def -(block: => Unit): Binding[A] = {
-    bindingConfig.currentBinding = this
-    block
-    bindingConfig.currentBinding = null
-    this
-  }
-
-  def property(name: String): PropertyInjection = {
-    provider.addProperty(name)
-  }
-
-  def lifecycle(init: String, destroy: String) {
-    provider.setInitAndDestroy(init, destroy)
-  }
-  
-  override def create(binder: Binder) {
+  def create(binder: Binder) {
     // if an ID was provided
     if (id != null) {
       val binding = binder.bind(classOf[Object]).annotatedWith(Names.named(id))
-      bindTarget(binding, true)
+      key = Key.get(classOf[Object], Names.named(id))
+      bindTarget(binder, binding)
     }
-    // Standard From type binding
-    val binding = binder.bind(fromType)
-    bindTarget(binding, false)
+    else {
+      // Standard From type binding
+      val binding = binder.bind(bindType)
+      key = Key.get(bindType)
+      bindTarget(binder, binding)
+    }
+
+    nestedBindings.foreach(_.create(binder))
   }
-  
-  private def bindTarget[T >: A](binding: LinkedBindingBuilder[T], forceToBinding: Boolean) {
-    var bindingTargeted: ScopedBindingBuilder[A] = binding
-    bindingTargeted = binding.toProvider(provider)
-    bindingTargeted.asEagerSingleton()
+
+  def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
+    
   }
-  
+
+  def set(block: => Unit) {
+    throw new IllegalStateException("Block settings are not valid for bindings of type [" + this.getClass + "]")
+  }
+
+  def property(name: String): PropertyInjection = {
+    throw new IllegalStateException("Setting 'property' not valid for bindings of type [" + this.getClass + "]")
+  }
+
+  def lifecycle(init: String, destroy: String) {
+    throw new IllegalStateException("Setting 'lifecycle' not valid for bindings of type [" + this.getClass + "]")
+  }
+
+  def exportService(dict: Tuple2[String, Object]*) {
+    throw new IllegalStateException("Setting 'exportService' not valid for bindings of type [" + this.getClass + "]")
+  }
+
 }

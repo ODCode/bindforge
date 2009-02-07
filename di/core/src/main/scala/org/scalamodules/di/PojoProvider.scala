@@ -13,10 +13,15 @@ trait InjectionPoint {
 class PropertyInjection(name: String) extends InjectionPoint {
   
   var ref: String = _
+  var _value: Any = _
   
-  def <--(ref: String): PropertyInjection = {
+  def ref(ref: String): PropertyInjection = {
     this.ref = ref
     this
+  }
+
+  def value(value: Any) {
+    _value = value
   }
   
   def inject[A](clazz: Class[A], obj: A, injector: Injector) {
@@ -29,28 +34,46 @@ class PropertyInjection(name: String) extends InjectionPoint {
       methods = clazz.getMethods.filter(_.getName == setterName)
     }
     val setMethod: Method = methods(0)
-        
-    val paramType = setMethod.getParameterTypes()(0)
-    val key = if (ref == null) Key.get(paramType) else Key.get(classOf[Object], Names.named(ref))
-    val paramValue = injector.getInstance(key).asInstanceOf[Object]
-    
-    setMethod.invoke(obj, paramValue)
+
+    if (_value == null) {
+      val paramType = setMethod.getParameterTypes()(0)
+      val key = if (ref == null) Key.get(paramType) else Key.get(classOf[Object], Names.named(ref))
+      val paramValue = injector.getInstance(key).asInstanceOf[Object]
+      setMethod.invoke(obj, paramValue)
+    }
+    else {
+      setMethod.invoke(obj, _value.asInstanceOf[Object])
+    }
   }
 }
 
-class PojoProvider[A <: Object](binding: Binding[A]) extends Provider[A] {
+class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
   
   @Inject
   var injector: Injector = _
 
   private val injectionPoints = new ListBuffer[InjectionPoint]
 
-  var _initMethod: String = _
-  var _destroyMethod: String = _
+  private var initMethod: Method = _
+  private var destroyMethod: Method = _
+  private var instance: A = _
 
   def setInitAndDestroy(init: String, destroy: String) {
-    _initMethod = init
-    _destroyMethod = destroy
+    initMethod = getMethod(init, "init")
+    destroyMethod = getMethod(destroy, "destroy")
+  }
+
+  def getMethod(methodName: String, defaultName: String): Method = {
+    if (methodName != null) {
+      val m = ReflectUtils.getMethod(binding.toType, methodName)
+      if (m == null) {
+        throw new IllegalStateException("Method with name [" + methodName + "] is not defined in class [" + binding.toType.getName + "]")
+      }
+      else {
+        return m
+      }
+    }
+    return null
   }
 
   def addProperty(name: String): PropertyInjection = {
@@ -60,22 +83,31 @@ class PojoProvider[A <: Object](binding: Binding[A]) extends Provider[A] {
   }
 
   def get(): A = {
+    if (instance == null) {
+      create()
+    }
+    instance
+  }
+
+  def create() {
     val obj = binding.toType.newInstance
 
     // Default Guice injection mechanism
     injector.injectMembers(obj)
 
     // ScalaModules DI mechanism
-    injectionPoints.foreach(_.inject(binding.fromType, obj, injector))
+    injectionPoints.foreach(_.inject(binding.bindType, obj, injector))
 
-    if (_initMethod != null) {
+    // if defined, execute init method
+    if (initMethod != null) {
       executeInitMethod(obj)
     }
-       
-    obj
+
+    instance = obj
   }
 
   def executeInitMethod(obj: A) {
+    initMethod.invoke(obj)
   }
 
 }
