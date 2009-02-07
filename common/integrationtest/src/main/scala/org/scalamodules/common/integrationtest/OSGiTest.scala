@@ -11,7 +11,7 @@ import org.ops4j.pax.exam.CoreOptions.options
 import org.ops4j.pax.exam.CoreOptions.provision
 import org.ops4j.pax.exam.CoreOptions.wrappedBundle
 
-import org.scalatest.Suite
+import org.scalatest.{SuperSuite, Suite, Stopper}
 
 import org.osgi.framework.BundleContext
 
@@ -44,7 +44,8 @@ class OSGiTest extends Suite {
     println("==================")
     println("Starting ScalaTest")
     println("==================")
-    this.execute()
+    val suite = new SuperSuite(List(this))
+    suite.execute(None, new IntegrationReporter, new Stopper {}, Set(), Set(), Map(), None)
     println("==================")
     println("End ScalaTest")
     println("==================")
