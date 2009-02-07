@@ -66,6 +66,12 @@ class RichBundleContext(context: BundleContext) {
     new GetMany[T](context, serviceInterface)
 
   /**
+   * Creates a Track (for service consumption) for the given service interface. 
+   */
+  def track[T](serviceInterface: Class[T]): Track[T] =
+    new Track[T](context, serviceInterface)
+
+  /**
    * Gets the service for the given service reference 
    * and applies the given function if the service exists.
    */

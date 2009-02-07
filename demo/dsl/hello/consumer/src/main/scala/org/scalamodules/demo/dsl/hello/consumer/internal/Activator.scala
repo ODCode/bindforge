@@ -22,8 +22,11 @@ package org.scalamodules.demo.dsl.hello.consumer.internal
 import org.osgi.framework.{BundleActivator, BundleContext}
 import org.scalamodules.demo.dsl.hello.provider.HelloService
 import org.scalamodules.dsl.core.RichBundleContext.fromBundleContext
+import org.scalamodules.dsl.core.Track
 
 class Activator extends BundleActivator {
+  
+  private var track: Track[HelloService] = _
 
   override def start(context: BundleContext) {
 
@@ -73,8 +76,16 @@ class Activator extends BundleActivator {
       case None         => println("No HelloServices available!")
       case Some(hellos) => hellos.foreach(println)
     }
+  
+    println("track:")
+    track = context track classOf[HelloService] onAdd {
+      demoService => println("onAdd: " + demoService.hello)
+    } onRemove {
+      demoService => println("onRemove: " + demoService.hello)
+    } start
   }
 
-  override def stop(context: BundleContext) { // Nothing!
+  override def stop(context: BundleContext) {
+    track.stop()
   }
 }
