@@ -38,3 +38,14 @@ class ClientWithoutAnnotation {
   
   def getMyService(): MyService = myService
 }
+
+class ServiceWithIntProperty {
+
+  var intProperty: int = _
+
+  def setIntProperty(i: int) = intProperty = i
+  def getIntProperty() = intProperty
+}
+
+
+

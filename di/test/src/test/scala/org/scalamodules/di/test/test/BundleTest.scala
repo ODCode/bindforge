@@ -20,9 +20,8 @@ import org.scalamodules.common.integrationtest._
 
 
 class AService {
-
+  
 }
-
 
 @RunWith(classOf[JUnit4TestRunner])
 class BundleTest extends OSGiTest {
@@ -43,23 +42,29 @@ class BundleTest extends OSGiTest {
 
   def testServiceImport() {
     class SimpleModule extends BindingConfig {
-      importService[PackageAdmin]
+      importService [PackageAdmin]
     }
     val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
 
     val pa = i.getInstance(Key.get(classOf[PackageAdmin]))
-    // use scalatest methods e.g. ===
     assertTrue(pa != null)
     assertTrue(pa.isInstanceOf[PackageAdmin])
   }
 
-def testServiceExport() {
+  def testServiceExport() {
     class SimpleModule extends BindingConfig {
-      bind[AService] - {
+      bind [AService] set {
+        exportService("key1" -> "value1", "key2" -> "value2")
       }
     }
     val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
-    i
+    context.getAllServiceReferences(null, null).foreach{ref =>
+      println(ref)
+      ref.getPropertyKeys.foreach{key =>
+        println(key + " : " + ref.getProperty(key))
+      }
+      println("----")
+    }
   }
 
 }
