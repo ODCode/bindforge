@@ -24,18 +24,17 @@ class BundleTracker(context: BundleContext) extends BundleListener {
   def start() {
     synchronized {
       context.addBundleListener(this)
-      context.getBundles.filter(trackBundle).foreach(startTrackingBundle)
+      context.getBundles.foreach(analyseBundleForTracking)
     }
   }
   
   def bundleChanged(event: BundleEvent) {
-    val b = event.getBundle
-    if (trackBundle(b)) {
-      startTrackingBundle(event.getBundle)
-    }
-    else if (event.getType == BundleEvent.STOPPED && trackedBundles.contains(event.getBundle)) {
+    if (event.getType == BundleEvent.STOPPED && trackedBundles.contains(event.getBundle)) {
       trackedBundles.removeEntry(event.getBundle)
       stopTrackingBundle(event.getBundle)
+    }
+    else {
+      analyseBundleForTracking(event.getBundle)
     }
   }
 
@@ -46,28 +45,38 @@ class BundleTracker(context: BundleContext) extends BundleListener {
     }
   }
 
-  def trackBundle(bundle: Bundle): Boolean = {
+  def analyseBundleForTracking(bundle: Bundle): Boolean = {
     synchronized {
       logger.debug("Analysing bundle [{}]", bundle.getSymbolicName)
 
       // Is bundle ACTIVE?
-      if (bundle.getState != Bundle.ACTIVE) return false
+      if (bundle.getState != Bundle.ACTIVE) {
+        logger.debug("Bundle [{}] not ACTIVE", bundle.getSymbolicName)
+        return false
+      }
 
       // Already tracked?
-      if (trackedBundles.contains(bundle)) return false
+      if (trackedBundles.contains(bundle)) {
+        logger.debug("Bundle [{}] already processed", bundle.getSymbolicName)
+        return false
+      }
 
       // If the bundle does not contain a binding config, return false
       val enums = bundle.findEntries(DEFAULT_BINDING_CONFIG_DIR, DEFAULT_BINDING_CONFIG_FILE, false)
-      if (enums == null || !enums.hasMoreElements) return false
+      if (enums == null || !enums.hasMoreElements) {
+        logger.debug("Bundle [{}] does not have binding configuration", bundle.getSymbolicName)
+        return false
+      }
 
       // Else, track the bundle
       trackedBundles.addEntry(bundle)
+      startTrackingBundle(bundle)
       true
     }
   }
 
   def startTrackingBundle(bundle: Bundle) {
-    logger.info("Bundle with binding configuration ACTIVE [{}]", bundle.getSymbolicName)
+    logger.info("Creating binding configuration for bundle [{}]", bundle.getSymbolicName)
     val enums = bundle.findEntries(DEFAULT_BINDING_CONFIG_DIR, DEFAULT_BINDING_CONFIG_FILE, false)
     val url = enums.nextElement.asInstanceOf[java.net.URL]
     val cf = new ConfigFile(context, url)
@@ -75,7 +84,7 @@ class BundleTracker(context: BundleContext) extends BundleListener {
   }
 
   def stopTrackingBundle(bundle: Bundle) {
-    logger.info("Bundle with binding configuration STOPPED [{}]", bundle.getSymbolicName)
+    logger.info("Closing binding configuration for bundle [{}]", bundle.getSymbolicName)
   }
 
 }

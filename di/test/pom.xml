@@ -22,5 +22,10 @@
 			<artifactId>scalamodules.di</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.scalamodules</groupId>
+			<artifactId>scalamodules.di.testbundle</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 </project>

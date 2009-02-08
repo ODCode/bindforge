@@ -1,6 +1,8 @@
 
 package org.scalamodules.di.test.test
 
+import org.slf4j.LoggerFactory
+
 import org.junit.Test
 import org.junit.Assert._
 import org.junit.runner.RunWith
@@ -22,6 +24,8 @@ import org.scalamodules.common.integrationtest._
 @RunWith(classOf[JUnit4TestRunner])
 class ExtenderTest extends OSGiTest {
 
+  //private val logger = LoggerFactory.getLogger(this.getClass)
+
   addBundle("org.scalamodules", "scalamodules.di", "1.0.0")
   addBundle("org.scalamodules", "scalamodules.di.testbundle", "1.0.0")
 
@@ -39,7 +43,15 @@ class ExtenderTest extends OSGiTest {
   def wrapper() = runScalaTest
 
   def testServiceImport() {
-    println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    println("starting thread to buy some time")
+    println("will be fixed soon!")
+    try {
+      Thread.sleep(3000)
+      println("done")
+    }
+    catch {
+      case _ =>
+    }
   }
 
 }

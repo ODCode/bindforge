@@ -34,17 +34,17 @@ import org.scalamodules.di.internal.compiler._
 
 class ConfigFile(context: BundleContext, url: URL) {
 
+  private val logger = LoggerFactory.getLogger(this.getClass)
+
   private val scanner  = new Scanner(url.openStream)
   private val builder = new StringBuilder
 
 
   builder.append("import org.scalamodules.di._ \n");
   builder.append("class Module extends BindingConfig { \n");
-
   while (scanner.hasNextLine) {
     builder.append(scanner.nextLine + "\n")
   }
-
   builder.append("\n}\n");
 
   def compile() {
@@ -55,27 +55,21 @@ class ConfigFile(context: BundleContext, url: URL) {
     val compiler = new ScalaCompiler(settings, reporter, cp)
 
     val run = new compiler.Run
-    val code = "class ABC {println(1+1)}A"
+    val code = "class ABC {println(\"WWWWWWWWWW\")}"
 
-    println("start compile")
     run.compileSources(List(new BatchSourceFile("123delme", code.toCharArray)))
-    println("end compile")
     if (reporter.hasErrors) {
-      println("errors start")
       println(reporter.toString)
-      println("errors stop")
-    }
-    else {
-      println("no errors")
     }
     reporter.flush
-    println("flushed")
 
     val parentCl = classOf[ConfigFile].getClassLoader
     val classLoader = new AbstractFileClassLoader(compiler.genJVM.outputDir, parentCl)
     val script = Class.forName("ABC", true, classLoader)
     println(script)
     script.newInstance
+
+    println("working dir is " + new java.io.File(".").getCanonicalPath)
 
     1
   }
@@ -85,12 +79,10 @@ class ConfigFile(context: BundleContext, url: URL) {
     val bundleFs = new Array[AbstractFile](bundles.length)
 
     for ((b, i) <- bundles.zipWithIndex) {
-      println("analysing bundle " + b)
       val url = bundles(i).getResource("/")
       if (url != null) {
         if ("file".equals(url.getProtocol())) {
           try {
-            println("- creating plainfile for " + url)
             bundleFs(i) = new PlainFile(new File(url.toURI()))
           }
           catch {
@@ -98,7 +90,6 @@ class ConfigFile(context: BundleContext, url: URL) {
           }
         }
         else {
-          println("- creating bundlefs for " + bundles(i))
           bundleFs(i) = BundleFS.create(bundles(i))
         }
       }

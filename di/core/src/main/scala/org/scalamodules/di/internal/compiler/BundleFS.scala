@@ -122,7 +122,6 @@ object BundleFS {
       }
 
       def lookupName(name: String, directory: Boolean): AbstractFile = {
-        //val entry = bundle.getEntry(fullName + "/" + name)
         val entry = bundle.getResource(fullName + "/" + name)
         nullOrElse(entry) { entry =>
           if (directory)

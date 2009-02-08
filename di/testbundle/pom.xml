@@ -12,8 +12,7 @@
         <version>1.0.0</version>
         <relativePath>../../poms/pom-bundle-scala.xml</relativePath>
     </parent>
-    <dependencies>
-    </dependencies>
+   
     <build>
         <plugins>
             <plugin>
