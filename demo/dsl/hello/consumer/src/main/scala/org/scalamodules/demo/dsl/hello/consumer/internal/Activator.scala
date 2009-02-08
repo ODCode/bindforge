@@ -76,7 +76,7 @@ class Activator extends BundleActivator {
       case None         => println("No HelloServices available!")
       case Some(hellos) => hellos.foreach(println)
     }
-  
+
     println("track:")
     track = context track classOf[HelloService] onAdd {
       demoService => println("onAdd: " + demoService.hello)

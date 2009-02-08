@@ -71,18 +71,15 @@ class Track[T](context: BundleContext, serviceInterface: Class[T],
    * Starts tracking.
    */
   def start: Track[T] = {
-    println("++start")
     tracker = new ServiceTracker(context, serviceInterface.getName, null) {
       override def addingService(ref: ServiceReference) = {
-        println("++addingService")
-        val t = context.getService(ref).asInstanceOf[T]  // Cannot be null (-> spec.)
+        val service = context.getService(ref)  // Cannot be null (-> spec.)
         a match {
-          case None    =>
-          case Some(f) => f(t)
+          case None    => service
+          case Some(f) => f(service.asInstanceOf[T]); service
         }
       }
-      override def removedService(ref: ServiceReference, t: AnyRef) = {
-        println("++removedService")
+      override def removedService(ref: ServiceReference, service: AnyRef) = {
         r match {
           case None    =>
           case Some(f) => f(t.asInstanceOf[T])
