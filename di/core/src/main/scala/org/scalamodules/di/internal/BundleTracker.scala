@@ -16,62 +16,66 @@ class BundleTracker(context: BundleContext) extends BundleListener {
   
   private val logger = LoggerFactory.getLogger(this.getClass)
   
-  val SCALAMODULES_CONFIG = "Binding-Config"
+  val DEFAULT_BINDING_CONFIG_DIR = "OSGI-INF/taileron/"
+  val DEFAULT_BINDING_CONFIG_FILE = "binding.tsc"
   
   val trackedBundles = new HashSet[Bundle]()
   
   def start() {
     synchronized {
       context.addBundleListener(this)
-      context.getBundles.foreach(addBundle)
-    }
-  }
-  
-  def stop() {
-    synchronized {
-      trackedBundles.foreach(removeBundle)
-      context.removeBundleListener(this)  
+      context.getBundles.filter(trackBundle).foreach(startTrackingBundle)
     }
   }
   
   def bundleChanged(event: BundleEvent) {
-    if (event.getType == BundleEvent.STARTED)
-      addBundle(event.getBundle)
-    else if (event.getType == BundleEvent.STOPPED)
-      removeBundle(event.getBundle)
-  } 
-  
-  def addBundle(bundle: Bundle) {
-    synchronized {
-      val configHeader = bundle.getHeaders().get(SCALAMODULES_CONFIG)
-      if (configHeader != null) {
-        onStartedBundle(bundle, configHeader.asInstanceOf[String])
-        trackedBundles.addEntry(bundle)
-      }
+    val b = event.getBundle
+    if (trackBundle(b)) {
+      startTrackingBundle(event.getBundle)
+    }
+    else if (event.getType == BundleEvent.STOPPED && trackedBundles.contains(event.getBundle)) {
+      trackedBundles.removeEntry(event.getBundle)
+      stopTrackingBundle(event.getBundle)
     }
   }
-  
-  def removeBundle(bundle: Bundle) {
+
+  def stop() {
     synchronized {
-      if (trackedBundles.contains(bundle))
-        onStoppedBundle(bundle)
-      trackedBundles.removeEntry(bundle)
+      context.removeBundleListener(this)
+      trackedBundles.foreach(stopTrackingBundle)
     }
   }
-  
-  def onStartedBundle(bundle: Bundle, config: String) {
-    println("Bundle with binding configuration STARTED [" + bundle + "]")
-    val clazz = bundle.loadClass(config)
-    val instance = clazz.newInstance().asInstanceOf[BindingConfig]
-    val module = instance.create()
-    
-    val injector = Guice.createInjector(module)
-    injector
+
+  def trackBundle(bundle: Bundle): Boolean = {
+    synchronized {
+      logger.debug("Analysing bundle [{}]", bundle.getSymbolicName)
+
+      // Is bundle ACTIVE?
+      if (bundle.getState != Bundle.ACTIVE) return false
+
+      // Already tracked?
+      if (trackedBundles.contains(bundle)) return false
+
+      // If the bundle does not contain a binding config, return false
+      val enums = bundle.findEntries(DEFAULT_BINDING_CONFIG_DIR, DEFAULT_BINDING_CONFIG_FILE, false)
+      if (enums == null || !enums.hasMoreElements) return false
+
+      // Else, track the bundle
+      trackedBundles.addEntry(bundle)
+      true
+    }
   }
-  
-  def onStoppedBundle(bundle: Bundle) {
-    println("Bundle with binding configuration STOPPED [" + bundle + "]")
+
+  def startTrackingBundle(bundle: Bundle) {
+    logger.info("Bundle with binding configuration ACTIVE [{}]", bundle.getSymbolicName)
+    val enums = bundle.findEntries(DEFAULT_BINDING_CONFIG_DIR, DEFAULT_BINDING_CONFIG_FILE, false)
+    val url = enums.nextElement.asInstanceOf[java.net.URL]
+    val cf = new ConfigFile(context, url)
+    cf.compile()
   }
-  
-  
+
+  def stopTrackingBundle(bundle: Bundle) {
+    logger.info("Bundle with binding configuration STOPPED [{}]", bundle.getSymbolicName)
+  }
+
 }

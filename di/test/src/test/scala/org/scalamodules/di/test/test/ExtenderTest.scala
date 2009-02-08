@@ -19,14 +19,12 @@ import org.scalamodules.di._
 import org.scalamodules.common.integrationtest._
 
 
-class AService {
-  
-}
-
 @RunWith(classOf[JUnit4TestRunner])
-class BundleTest extends OSGiTest {
+class ExtenderTest extends OSGiTest {
 
   addBundle("org.scalamodules", "scalamodules.di", "1.0.0")
+  addBundle("org.scalamodules", "scalamodules.di.testbundle", "1.0.0")
+
   addBundle("org.ops4j", "peaberry", "1.0")
   addWrappedBundle("org.ops4j.peaberry.dependencies", "guice", "2.0-SNAPSHOT")
   addWrappedBundle("org.ops4j.peaberry.dependencies", "aopalliance", "1.0-SNAPSHOT")
@@ -41,27 +39,7 @@ class BundleTest extends OSGiTest {
   def wrapper() = runScalaTest
 
   def testServiceImport() {
-    class SimpleModule extends BindingConfig {
-      importService [PackageAdmin]
-    }
-    val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
-
-    val pa = i.getInstance(Key.get(classOf[PackageAdmin]))
-    assertTrue(pa != null)
-    assertTrue(pa.isInstanceOf[PackageAdmin])
-  }
-
-  def testServiceExport() {
-    class SimpleModule extends BindingConfig {
-      bind [AService] set {
-        exportService("key1" -> "value1", "key2" -> "value2")
-      }
-    }
-    val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
-    context.getAllServiceReferences(null, null).foreach{ref =>
-      ref.getPropertyKeys.foreach{key =>
-      }
-    }
+    println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
   }
 
 }
