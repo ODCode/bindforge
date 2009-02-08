@@ -20,25 +20,28 @@
 package org.scalamodules.dsl.core
 
 import scala.collection.Map
-import org.osgi.framework.{BundleContext, ServiceReference}
+import org.osgi.framework.{BundleContext, Filter, ServiceReference}
 import org.osgi.util.tracker.ServiceTracker
-import org.scalamodules.dsl.core.RichBundleContext.fromBundleContext
+import org.scalamodules.dsl.core.RichServiceReference.fromServiceReference
 
 /**
  * Helper for tracking services.
  */
 class Track[T](context: BundleContext, serviceInterface: Class[T],
-               filter: String, a: Option[T => Unit], r: Option[T => Unit]) {
+               filter: Option[String], 
+               a: Option[(T, Map[String, AnyRef]) => Unit], 
+               r: Option[(T, Map[String, AnyRef]) => Unit]) {
 
   require(context != null, "Bundle context must not be null!")
   require(serviceInterface != null, "Service interface must not be null!")
-  require(serviceInterface != null, "Option for add-function must not be null!")
-  require(serviceInterface != null, "Option for remove-function must not be null!")
+  require(filter != null, "Option for filter must not be null!")
+  require(a != null, "Option for add-function must not be null!")
+  require(r != null, "Option for remove-function must not be null!")
   
   private var tracker: ServiceTracker = _
   
   def this(context: BundleContext, serviceInterface: Class[T]) {
-    this(context, serviceInterface, null, None, None)
+    this(context, serviceInterface, None, None, None)
   }
 
   // ===========================================================================
@@ -48,13 +51,15 @@ class Track[T](context: BundleContext, serviceInterface: Class[T],
   /**
    * Creates a Track with the given filter.
    */
-  def withFilter(filter: String): Track[T] =
-    new Track(context, serviceInterface, filter, a, r)
+  def withFilter(filter: String): Track[T] = {
+    require(filter != null, "Filter must not be null!")
+    new Track(context, serviceInterface, Some(filter), a, r)
+  }
 
   /**
    * Applies the given function to a service being added.
    */
-  def onAdd(f: T => Unit): Track[T] = {
+  def onAdd(f: (T, Map[String, AnyRef]) => Unit): Track[T] = {
     require(f != null, "Add-function must not be null!")
     new Track(context, serviceInterface, filter, Some(f), r)
   }
@@ -62,7 +67,7 @@ class Track[T](context: BundleContext, serviceInterface: Class[T],
   /**
    * Applies the given function to a service being removed.
    */
-  def onRemove(f: T => Unit): Track[T] = {
+  def onRemove(f: (T, Map[String, AnyRef]) => Unit): Track[T] = {
     require(f != null, "Remove-function must not be null!")
     new Track(context, serviceInterface, filter, a, Some(f))
   }
@@ -71,18 +76,18 @@ class Track[T](context: BundleContext, serviceInterface: Class[T],
    * Starts tracking.
    */
   def start: Track[T] = {
-    tracker = new ServiceTracker(context, serviceInterface.getName, null) {
+    tracker = new ServiceTracker(context, buildFilter, null) {
       override def addingService(ref: ServiceReference) = {
         val service = context.getService(ref)  // Cannot be null (-> spec.)
         a match {
           case None    => service
-          case Some(f) => f(service.asInstanceOf[T]); service
+          case Some(f) => f(service.asInstanceOf[T], ref.properties); service
         }
       }
       override def removedService(ref: ServiceReference, service: AnyRef) = {
         r match {
           case None    =>
-          case Some(f) => f(t.asInstanceOf[T])
+          case Some(f) => f(service.asInstanceOf[T], ref.properties)
         }
         context.ungetService(ref)
       }
@@ -95,4 +100,16 @@ class Track[T](context: BundleContext, serviceInterface: Class[T],
    * Stops tracking.
    */
   def stop() { tracker.close() }
+
+  // ===========================================================================
+  //  NON-API
+  // ===========================================================================
+
+  private def buildFilter: Filter =  {
+    val filterString = filter match {
+      case None    => String.format("(objectClass=%s)", serviceInterface.getName)
+      case Some(s) => String.format("(&(objectClass=%s)%s)", serviceInterface.getName, s)
+    }
+    context.createFilter(filterString)
+  } 
 }

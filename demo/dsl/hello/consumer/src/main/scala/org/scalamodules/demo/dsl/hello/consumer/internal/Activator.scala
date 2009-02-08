@@ -27,7 +27,8 @@ import org.scalamodules.dsl.core.Track
 class Activator extends BundleActivator {
   
   private var track: Track[HelloService] = _
-
+  private var track2: Track[HelloService] = _
+  
   override def start(context: BundleContext) {
 
     println("getOne:")
@@ -79,13 +80,21 @@ class Activator extends BundleActivator {
 
     println("track:")
     track = context track classOf[HelloService] onAdd {
-      demoService => println("onAdd: " + demoService.hello)
+      (demoService, _) => println("onAdd: " + demoService.hello)
     } onRemove {
-      demoService => println("onRemove: " + demoService.hello)
+      (demoService, _)  => println("onRemove: " + demoService.hello)
+    } start
+
+    println("track withFilter:")
+    track2 = context track classOf[HelloService] withFilter "(name=*)" onAdd {
+      (demoService, properties) => println("onAdd: " + demoService.hello + "; name=" + properties.get("name").get)
+    } onRemove {
+      (demoService, properties)  => println("onRemove: " + demoService.hello + "; name=" + properties.get("name").get)
     } start
   }
 
   override def stop(context: BundleContext) {
     track.stop()
+    track2.stop()
   }
 }
