@@ -40,7 +40,7 @@ class ConfigFile(context: BundleContext, url: URL) {
   private val builder = new StringBuilder
 
   private val packageName = calculatePackageName()
-  private val className = "BundleBindingConfig"
+  private val className = "BindingConfig"
   private val FQCN = packageName + "." + className
 
   builder.append("package " + packageName + " \n")
@@ -55,10 +55,13 @@ class ConfigFile(context: BundleContext, url: URL) {
   def compile() {
     val bundles = context.getBundles
     val cp = getClassPath(bundles)
+
+    // TODO: check if class is already compiled
+
     val settings = new Settings(null)
     val reporter = new LogReporter(LoggerFactory.getLogger(classOf[ScalaCompiler]), settings)
     val compiler = new ScalaCompiler(settings, reporter, cp)
-
+    compiler.genJVM.outputDir = new PlainFile(context.getDataFile("."))
     val run = new compiler.Run
 
     run.compileSources(List(new BatchSourceFile(FQCN, builder.toString.toCharArray)))
@@ -99,9 +102,9 @@ class ConfigFile(context: BundleContext, url: URL) {
   }
 
   def calculatePackageName(): String = {
-    "org.taileron._generated_" +
-    context.getBundle.getSymbolicName +
-    context.getBundle.getBundleId
+    (context.getBundle.getSymbolicName +
+     "_" +
+     context.getBundle.getBundleId).replaceAll("\\.", "_")
   }
   
 }

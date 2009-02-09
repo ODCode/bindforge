@@ -41,11 +41,15 @@ class OSGiTest extends Suite {
         provision(bundles.toArray: _*));
   }
 
-  def runScalaTest {
+  def runScalaTest() {
+    runScalaTest(this)
+  }
+
+  def runScalaTest(obj: Suite) {
     println("==================")
     println("Starting ScalaTest")
     println("==================")
-    val suite = new SuperSuite(List(this))
+    val suite = new SuperSuite(List(obj))
     suite.execute(None, new IntegrationReporter, new Stopper {}, Set(), Set(), Map(), None)
     println("==================")
     println("End ScalaTest")

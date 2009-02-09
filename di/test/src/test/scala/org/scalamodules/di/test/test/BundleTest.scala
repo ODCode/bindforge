@@ -1,3 +1,18 @@
+/*
+ * Copyright 2009 Roman Roelofsen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.scalamodules.di.test.test
 
@@ -20,13 +35,14 @@ import org.scalamodules.common.integrationtest._
 
 
 class AService {
-  
 }
 
 @RunWith(classOf[JUnit4TestRunner])
 class BundleTest extends OSGiTest {
 
   addBundle("org.scalamodules", "scalamodules.di", "1.0.0")
+  addBundle("org.scalamodules", "scalamodules.di.testbundle", "1.0.0")
+
   addBundle("org.ops4j", "peaberry", "1.0")
   addWrappedBundle("org.ops4j.peaberry.dependencies", "guice", "2.0-SNAPSHOT")
   addWrappedBundle("org.ops4j.peaberry.dependencies", "aopalliance", "1.0-SNAPSHOT")
@@ -40,6 +56,9 @@ class BundleTest extends OSGiTest {
   @Test
   def wrapper() = runScalaTest
 
+
+  /**
+   */
   def testServiceImport() {
     class SimpleModule extends BindingConfig {
       importService [PackageAdmin]
@@ -47,10 +66,12 @@ class BundleTest extends OSGiTest {
     val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
 
     val pa = i.getInstance(Key.get(classOf[PackageAdmin]))
-    assertTrue(pa != null)
-    assertTrue(pa.isInstanceOf[PackageAdmin])
+    assert(pa != null)
+    assert(pa.isInstanceOf[PackageAdmin])
   }
 
+  /**
+   */
   def testServiceExport() {
     class SimpleModule extends BindingConfig {
       bind [AService] set {
@@ -61,6 +82,20 @@ class BundleTest extends OSGiTest {
     context.getAllServiceReferences(null, null).foreach{ref =>
       ref.getPropertyKeys.foreach{key =>
       }
+    }
+  }
+
+  /**
+   */
+  def testXXX() {
+    println("starting thread to buy some time")
+    println("will be fixed soon!")
+    try {
+      Thread.sleep(3000)
+      println("done sleeping")
+    }
+    catch {
+      case _ =>
     }
   }
 
