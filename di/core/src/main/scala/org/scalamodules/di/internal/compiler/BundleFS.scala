@@ -30,18 +30,20 @@ object BundleFS {
    * @param f
    * @return <code>f(s)</code> if s is not <code>null</code>, <code>null</code> otherwise.
    */
-  def nullOrElse[S, T](s: S)(f: S => T): T =
-  if (s == null) null.asInstanceOf[T]
-  else f(s)
+  def nullOrElse[S, T](s: S)(f: S => T): T = {
+    if (s == null) null.asInstanceOf[T]
+    else f(s)
+  }
 
   /**
    * @param t
    * @param default
    * @return <code>t</code> or <code>default</code> if <code>null</code>.
    */
-  def valueOrElse[T](t: T)(default: => T) =
-  if (t == null) default
-  else t
+  def valueOrElse[T](t: T)(default: => T) = {
+    if (t == null) default
+    else t
+  }
 
   /**
    * Create a new {@link AbstractFile} instance representing an
@@ -87,11 +89,11 @@ object BundleFS {
         val u = url.getPath
         var k = u.length
         while( (k > 0) && (u(k - 1) == '/') )
-        k = k - 1
+          k = k - 1
 
         var j = k
         while( (j > 0) && (u(j - 1) != '/') )
-        j = j - 1
+          j = j - 1
 
         (u.substring(if (j > 0) 1 else 0, if (j > 1) j - 1 else j), u.substring(j, k))
       }
@@ -144,7 +146,6 @@ object BundleFS {
       def lookupName(name: String, directory: Boolean): AbstractFile = null
     }
 
-    println("Bundle: " + bundle + " getResource: " + bundle.getResource("/"))
     new DirEntry(bundle.getResource("/"), null)
   }
   

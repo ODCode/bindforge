@@ -39,13 +39,18 @@ class ConfigFile(context: BundleContext, url: URL) {
   private val scanner  = new Scanner(url.openStream)
   private val builder = new StringBuilder
 
+  private val packageName = calculatePackageName()
+  private val className = "BundleBindingConfig"
+  private val FQCN = packageName + "." + className
 
-  builder.append("import org.scalamodules.di._ \n");
-  builder.append("class Module extends BindingConfig { \n");
+  builder.append("package " + packageName + " \n")
+  builder.append("class " + className + " extends org.scalamodules.di.BindingConfig { \n");
   while (scanner.hasNextLine) {
     builder.append(scanner.nextLine + "\n")
   }
   builder.append("\n}\n");
+
+  println(builder.toString)
 
   def compile() {
     val bundles = context.getBundles
@@ -55,9 +60,8 @@ class ConfigFile(context: BundleContext, url: URL) {
     val compiler = new ScalaCompiler(settings, reporter, cp)
 
     val run = new compiler.Run
-    val code = "class ABC {println(\"WWWWWWWWWW\")}"
 
-    run.compileSources(List(new BatchSourceFile("123delme", code.toCharArray)))
+    run.compileSources(List(new BatchSourceFile(FQCN, builder.toString.toCharArray)))
     if (reporter.hasErrors) {
       println(reporter.toString)
     }
@@ -65,11 +69,8 @@ class ConfigFile(context: BundleContext, url: URL) {
 
     val parentCl = classOf[ConfigFile].getClassLoader
     val classLoader = new AbstractFileClassLoader(compiler.genJVM.outputDir, parentCl)
-    val script = Class.forName("ABC", true, classLoader)
-    println(script)
+    val script = Class.forName(FQCN, true, classLoader)
     script.newInstance
-
-    println("working dir is " + new java.io.File(".").getCanonicalPath)
 
     1
   }
@@ -95,6 +96,12 @@ class ConfigFile(context: BundleContext, url: URL) {
       }
     }
     bundleFs
+  }
+
+  def calculatePackageName(): String = {
+    "org.taileron._generated_" +
+    context.getBundle.getSymbolicName +
+    context.getBundle.getBundleId
   }
   
 }

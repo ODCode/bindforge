@@ -47,7 +47,7 @@ class ExtenderTest extends OSGiTest {
     println("will be fixed soon!")
     try {
       Thread.sleep(3000)
-      println("done")
+      println("done sleeping")
     }
     catch {
       case _ =>
