@@ -55,13 +55,10 @@ class ConfigFile(selfBundle: Bundle, targetBundle: Bundle, url: URL) {
   }
   builder.append("\n}\n");
 
-  println(builder.toString)
-
   def getBindingConfigClass() {
-    val cp = getAbstractFileClassPath
 
     // TODO: check if class is already compiled
-
+    val cp = getAbstractFileClassPath
     val settings = new Settings(null)
     val reporter = new LogReporter(LoggerFactory.getLogger(classOf[ScalaCompiler]), settings)
     val compiler = new ScalaCompiler(settings, reporter, cp)
@@ -91,11 +88,11 @@ class ConfigFile(selfBundle: Bundle, targetBundle: Bundle, url: URL) {
 
     // Add target bundle
     if (isReadable(targetBundle)) bundlesFs += targetBundle
-    else throw new IllegalStateException("Target bundle [" + targetBundle.getSymbolicName + "] is not readable")
+    else throw new IllegalStateException("Can not access bundle [" + targetBundle.getSymbolicName + "]")
     
     // Add DI bundle
     if (isReadable(selfBundle)) bundlesFs += selfBundle
-    else throw new IllegalStateException("Target bundle [" + targetBundle.getSymbolicName + "] is not readable")
+    else throw new IllegalStateException("Can not access bundle [" + targetBundle.getSymbolicName + "]")
 
     // Find and add scala lib and compiler bundle
     getScalaBundles.foreach(bundlesFs += _)
@@ -122,19 +119,22 @@ class ConfigFile(selfBundle: Bundle, targetBundle: Bundle, url: URL) {
   }
 
   def getAbstractFile(bundle: Bundle): AbstractFile = {
-    val url = bundle.getResource("/")
-    if ("file".equals(url.getProtocol())) {
-      try {
-        return new PlainFile(new File(url.toURI()))
-      }
-      catch {
-        case e: URISyntaxException =>
-          throw new IllegalArgumentException("Can't determine url of bundle " + bundle.getSymbolicName)
-      }
-    }
-    else {
-      return BundleFS.create(bundle)
-    }
+    /*
+     val url = bundle.getResource("/")
+     if ("file".equals(url.getProtocol())) {
+     try {
+     return new PlainFile(new File(url.toURI()))
+     }
+     catch {
+     case e: URISyntaxException =>
+     throw new IllegalArgumentException("Can't determine url of bundle " + bundle.getSymbolicName)
+     }
+     }
+     else {
+     return BundleFS.create(bundle)
+     }
+     */
+    return BundleFS.create(bundle)
   }
 
   def calculatePackageName(): String = {
