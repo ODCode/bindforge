@@ -1,5 +1,5 @@
 <assembly>
-    <id>scalamodules-assembly</id>
+    <id>bundles</id>
 	<formats>
 		<format>dir</format>
 	</formats>

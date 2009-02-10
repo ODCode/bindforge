@@ -20,19 +20,24 @@ import java.net.URL
 import java.net.URISyntaxException
 import java.io.File
 import java.util.Scanner
+
+import scala.collection.mutable.{ListBuffer, LinkedHashSet}
 import scala.tools.nsc.util.{SourceFile, BatchSourceFile}
 import scala.tools.nsc._
 import scala.tools.nsc.io.AbstractFile
 import scala.tools.nsc.io.PlainFile
 import scala.tools.nsc.interpreter.AbstractFileClassLoader
 import scala.tools.nsc.reporters.ConsoleReporter
+
 import org.osgi.framework.{Bundle, BundleContext}
+import org.osgi.service.packageadmin.PackageAdmin
+
 import org.slf4j.LoggerFactory
 
 import org.scalamodules.di.internal.compiler._
 
 
-class ConfigFile(context: BundleContext, url: URL) {
+class ConfigFile(selfBundle: Bundle, targetBundle: Bundle, url: URL) {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -52,16 +57,15 @@ class ConfigFile(context: BundleContext, url: URL) {
 
   println(builder.toString)
 
-  def compile() {
-    val bundles = context.getBundles
-    val cp = getClassPath(bundles)
+  def getBindingConfigClass() {
+    val cp = getAbstractFileClassPath
 
     // TODO: check if class is already compiled
 
     val settings = new Settings(null)
     val reporter = new LogReporter(LoggerFactory.getLogger(classOf[ScalaCompiler]), settings)
     val compiler = new ScalaCompiler(settings, reporter, cp)
-    compiler.genJVM.outputDir = new PlainFile(context.getDataFile("."))
+    compiler.genJVM.outputDir = new PlainFile(targetBundle.getBundleContext.getDataFile("."))
     val run = new compiler.Run
 
     run.compileSources(List(new BatchSourceFile(FQCN, builder.toString.toCharArray)))
@@ -78,33 +82,71 @@ class ConfigFile(context: BundleContext, url: URL) {
     1
   }
 
-  def getClassPath(bundles: Array[Bundle]): Array[AbstractFile] = {
+  def getAbstractFileClassPath(): Array[AbstractFile] = {
+    getBundlesForClassPath.map(getAbstractFile(_))
+  }
 
-    val bundleFs = new Array[AbstractFile](bundles.length)
+  def getBundlesForClassPath(): Array[Bundle] = {
+    val bundlesFs = new ListBuffer[Bundle]
 
-    for ((b, i) <- bundles.zipWithIndex) {
-      val url = bundles(i).getResource("/")
-      if (url != null) {
-        if ("file".equals(url.getProtocol())) {
-          try {
-            bundleFs(i) = new PlainFile(new File(url.toURI()))
-          }
-          catch {
-            case e: URISyntaxException => throw new IllegalArgumentException("Can't determine url of bundle " + i)
-          }
-        }
-        else {
-          bundleFs(i) = BundleFS.create(bundles(i))
-        }
+    // Add target bundle
+    if (isReadable(targetBundle)) bundlesFs += targetBundle
+    else throw new IllegalStateException("Target bundle [" + targetBundle.getSymbolicName + "] is not readable")
+    
+    // Add DI bundle
+    if (isReadable(selfBundle)) bundlesFs += selfBundle
+    else throw new IllegalStateException("Target bundle [" + targetBundle.getSymbolicName + "] is not readable")
+
+    // Find and add scala lib and compiler bundle
+    getScalaBundles.foreach(bundlesFs += _)
+
+    bundlesFs.toArray
+  }
+
+  def isReadable(bundle: Bundle): boolean = {
+    bundle.getResource("/") != null
+  }
+
+  def getScalaBundles(): Array[Bundle] = {
+    val scalaBundles = new LinkedHashSet[Bundle]
+
+    // Scala library
+    val b1 = getPackageAdmin.getExportedPackage("scala").getExportingBundle
+    if (b1 != null) scalaBundles += b1
+
+    // Scala compiler
+    val b2 = getPackageAdmin.getExportedPackage("scala.tools.nsc").getExportingBundle
+    if (b2 != null) scalaBundles += b2
+
+    scalaBundles.toArray
+  }
+
+  def getAbstractFile(bundle: Bundle): AbstractFile = {
+    val url = bundle.getResource("/")
+    if ("file".equals(url.getProtocol())) {
+      try {
+        return new PlainFile(new File(url.toURI()))
+      }
+      catch {
+        case e: URISyntaxException =>
+          throw new IllegalArgumentException("Can't determine url of bundle " + bundle.getSymbolicName)
       }
     }
-    bundleFs
+    else {
+      return BundleFS.create(bundle)
+    }
   }
 
   def calculatePackageName(): String = {
-    (context.getBundle.getSymbolicName +
+    (targetBundle.getBundleContext.getBundle.getSymbolicName +
      "_" +
-     context.getBundle.getBundleId).replaceAll("\\.", "_")
+     targetBundle.getBundleContext.getBundle.getBundleId).replaceAll("\\.", "_")
+  }
+
+  def getPackageAdmin(): PackageAdmin = {
+    val ref = selfBundle.getBundleContext.getServiceReference(classOf[PackageAdmin].getName)
+    if (ref == null) throw new IllegalStateException("PackageAdmin is not registered")
+    selfBundle.getBundleContext.getService(ref).asInstanceOf[PackageAdmin]
   }
   
 }

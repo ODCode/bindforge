@@ -1,3 +1,19 @@
+/*
+ * Copyright 2009 Roman Roelofsen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.scalamodules.di.internal
 
 import scala.collection.mutable.HashSet
@@ -15,6 +31,8 @@ import org.scalamodules.di._
 class BundleTracker(context: BundleContext) extends BundleListener {
   
   private val logger = LoggerFactory.getLogger(this.getClass)
+
+  private var active = false
   
   val DEFAULT_BINDING_CONFIG_DIR = "OSGI-INF/taileron/"
   val DEFAULT_BINDING_CONFIG_FILE = "binding.tsc"
@@ -22,7 +40,12 @@ class BundleTracker(context: BundleContext) extends BundleListener {
   val trackedBundles = new HashSet[Bundle]()
   
   def start() {
+    if (active) {
+      logger.info("BundleTracker can not be started. Reason: Already active")
+      return
+    }
     synchronized {
+      active = true
       context.addBundleListener(this)
       context.getBundles.foreach(analyseBundleForTracking)
     }
@@ -39,7 +62,12 @@ class BundleTracker(context: BundleContext) extends BundleListener {
   }
 
   def stop() {
+    if (!active) {
+      logger.info("BundleTracker can not be stopped. Reason: Not active")
+      return
+    }
     synchronized {
+      active = false
       context.removeBundleListener(this)
       trackedBundles.foreach(stopTrackingBundle)
     }
@@ -74,8 +102,8 @@ class BundleTracker(context: BundleContext) extends BundleListener {
     logger.info("Creating binding configuration for bundle [{}]", bundle.getSymbolicName)
     val enums = bundle.findEntries(DEFAULT_BINDING_CONFIG_DIR, DEFAULT_BINDING_CONFIG_FILE, false)
     val url = enums.nextElement.asInstanceOf[java.net.URL]
-    val cf = new ConfigFile(bundle.getBundleContext, url)
-    cf.compile()
+    val cf = new ConfigFile(context.getBundle, bundle, url)
+    cf.getBindingConfigClass()
   }
 
   def stopTrackingBundle(bundle: Bundle) {
