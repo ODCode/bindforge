@@ -20,6 +20,7 @@
     <module>dsl</module>
     <module>di</module>
     <module>demo</module>
+    <module>assembly</module>
   </modules>
 
   <repositories>
