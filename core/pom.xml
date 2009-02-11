@@ -5,7 +5,7 @@
   <artifactId>di-parent</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
-  <name>ScalaModules - DI</name>
+  <name>Taileron - Core - Parent</name>
 
   <modules>
       <module>core</module>

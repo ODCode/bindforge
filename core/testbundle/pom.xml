@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>scalamodules.di.testbundle</artifactId>
     <packaging>jar</packaging>
-    <name>ScalaModules - DI - Test Bundle</name>
+    <name>Taileron - Core - Testbundle</name>
     <version>1.0.0</version>
     <parent>
         <groupId>org.scalamodules</groupId>

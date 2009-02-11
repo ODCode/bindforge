@@ -18,7 +18,7 @@
   <modules>
     <module>common</module>
     <module>dsl</module>
-    <module>di</module>
+    <module>core</module>
     <module>demo</module>
     <module>assembly</module>
   </modules>

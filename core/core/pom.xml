@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>scalamodules.di</artifactId>
     <packaging>jar</packaging>
-    <name>ScalaModules - DI - Core</name>
+    <name>Taileron - Core</name>
     <version>1.0.0</version>
     <parent>
         <groupId>org.scalamodules</groupId>
