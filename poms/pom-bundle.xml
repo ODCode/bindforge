@@ -6,8 +6,8 @@
   <packaging>pom</packaging>
 
   <parent>
-    <groupId>org.scalamodules</groupId>
-    <artifactId>scalamodules</artifactId>
+    <groupId>org.taileron</groupId>
+    <artifactId>taileron</artifactId>
     <version>1.0.0</version>
   </parent>
 

@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
 
   <parent>
-    <groupId>org.scalamodules</groupId>
+    <groupId>org.taileron</groupId>
     <artifactId>pom-bundle</artifactId>
     <version>1.0.0</version>
     <relativePath>./pom-bundle.xml</relativePath>
@@ -45,6 +45,7 @@
         <configuration>
           <args>
             <arg>-target:jvm-1.5</arg>
+            <arg>-deprecation</arg>
           </args>
           <jvmArgs>
             <jvmArg>-Xmx1024m</jvmArg>

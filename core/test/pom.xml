@@ -1,30 +1,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>scalamodules.di.test</artifactId>
+	<artifactId>taileron.di.test</artifactId>
 	<packaging>jar</packaging>
 	<name>Taileron - Core - Integration Tests</name>
     <version>1.0.0</version>
 	<parent>
-		<groupId>org.scalamodules</groupId>
+		<groupId>org.taileron</groupId>
 		<artifactId>pom-it-scala</artifactId>
 		<version>1.0.0</version>
 		<relativePath>../../poms/pom-it-scala.xml</relativePath>
 	</parent>
 	<dependencies>
 		<dependency>
-			<groupId>org.scalamodules</groupId>
-			<artifactId>scalamodules.common.integrationtest</artifactId>
+			<groupId>org.taileron</groupId>
+			<artifactId>taileron.common.integrationtest</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.scalamodules</groupId>
-			<artifactId>scalamodules.di</artifactId>
+			<groupId>org.taileron</groupId>
+			<artifactId>taileron.di</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.scalamodules</groupId>
-			<artifactId>scalamodules.di.testbundle</artifactId>
+			<groupId>org.taileron</groupId>
+			<artifactId>taileron.di.testbundle</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 	</dependencies>

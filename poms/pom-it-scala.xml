@@ -6,8 +6,8 @@
   <packaging>pom</packaging>
 
   <parent>
-    <groupId>org.scalamodules</groupId>
-    <artifactId>scalamodules</artifactId>
+    <groupId>org.taileron</groupId>
+    <artifactId>taileron</artifactId>
     <version>1.0.0</version>
   </parent>
 
@@ -119,7 +119,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>${pom.groupId}</groupId>
-                  <artifactId>scalamodules.common.integrationtest</artifactId>
+                  <artifactId>taileron.common.integrationtest</artifactId>
                   <version>1.0.0</version>
                   <type>jar</type>
                   <overWrite>false</overWrite>

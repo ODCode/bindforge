@@ -4,28 +4,28 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>assembly</artifactId>
     <packaging>pom</packaging>
-    <name>ScalaModules - Assembly</name>
+    <name>Taileron - Assembly</name>
     
     <parent>
-	    <groupId>org.scalamodules</groupId>
-	    <artifactId>scalamodules</artifactId>
+	    <groupId>org.taileron</groupId>
+	    <artifactId>taileron</artifactId>
 	    <version>1.0.0</version>
     </parent>
 	
     <dependencies>
 	    <dependency>
-		    <groupId>org.scalamodules</groupId>
-		    <artifactId>scalamodules.di</artifactId>
+		    <groupId>org.taileron</groupId>
+		    <artifactId>taileron.di</artifactId>
 		    <version>1.0.0</version>
 	    </dependency>
 	    <dependency>
-		    <groupId>org.scalamodules</groupId>
-		    <artifactId>scalamodules.di.testbundle</artifactId>
+		    <groupId>org.taileron</groupId>
+		    <artifactId>taileron.di.testbundle</artifactId>
 		    <version>1.0.0</version>
 	    </dependency>
 	    <dependency>
-		    <groupId>org.scalamodules</groupId>
-		    <artifactId>scalamodules.scala-library</artifactId>
+		    <groupId>org.taileron</groupId>
+		    <artifactId>taileron.scala-library</artifactId>
 		    <version>2.7.3</version>
 	    </dependency>
         <dependency>

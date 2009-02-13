@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>scalamodules.di.testbundle</artifactId>
+    <artifactId>taileron.di.testbundle</artifactId>
     <packaging>jar</packaging>
     <name>Taileron - Core - Testbundle</name>
     <version>1.0.0</version>
     <parent>
-        <groupId>org.scalamodules</groupId>
+        <groupId>org.taileron</groupId>
         <artifactId>pom-bundle-scala</artifactId>
         <version>1.0.0</version>
         <relativePath>../../poms/pom-bundle-scala.xml</relativePath>
@@ -20,7 +20,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Private-Package>org.scalamodules.di.testbundle.*</Private-Package>
+                        <Private-Package>org.taileron.di.testbundle.*</Private-Package>
                     </instructions>
                 </configuration>
             </plugin>

@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>scalamodules.common.integrationtest</artifactId>
+	<artifactId>taileron.common.integrationtest</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
-	<name>ScalaModules - Common - Integrationtest</name>
+	<name>Taileron - Common - Integrationtest</name>
 	<parent>
-		<groupId>org.scalamodules</groupId>
+		<groupId>org.taileron</groupId>
 		<artifactId>pom-bundle-scala</artifactId>
 		<version>1.0.0</version>
 		<relativePath>../../poms/pom-bundle-scala.xml</relativePath>
@@ -55,7 +55,7 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
-						<Export-Package>org.scalamodules.common.integrationtest;version=${pom.version}</Export-Package>
+						<Export-Package>org.taileron.common.integrationtest;version=${pom.version}</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
