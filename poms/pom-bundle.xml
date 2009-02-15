@@ -6,8 +6,8 @@
   <packaging>pom</packaging>
 
   <parent>
-    <groupId>org.taileron</groupId>
-    <artifactId>taileron</artifactId>
+    <groupId>org.bindforge</groupId>
+    <artifactId>bindforge</artifactId>
     <version>1.0.0</version>
   </parent>
 

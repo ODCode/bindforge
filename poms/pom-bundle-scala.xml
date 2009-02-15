@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
 
   <parent>
-    <groupId>org.taileron</groupId>
+    <groupId>org.bindforge</groupId>
     <artifactId>pom-bundle</artifactId>
     <version>1.0.0</version>
     <relativePath>./pom-bundle.xml</relativePath>

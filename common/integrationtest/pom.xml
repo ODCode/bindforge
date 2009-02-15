@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>taileron.common.integrationtest</artifactId>
+	<artifactId>bindforge.common.integrationtest</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
-	<name>Taileron - Common - Integrationtest</name>
+	<name>bindforge - common - integrationtest</name>
 	<parent>
-		<groupId>org.taileron</groupId>
+		<groupId>org.bindforge</groupId>
 		<artifactId>pom-bundle-scala</artifactId>
 		<version>1.0.0</version>
 		<relativePath>../../poms/pom-bundle-scala.xml</relativePath>
@@ -55,7 +55,7 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<configuration>
 					<instructions>
-						<Export-Package>org.taileron.common.integrationtest;version=${pom.version}</Export-Package>
+						<Export-Package>org.bindforge.common.integrationtest;version=${pom.version}</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

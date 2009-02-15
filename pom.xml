@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.taileron</groupId>
-  <artifactId>taileron</artifactId>
-  <name>Taileron</name>
+  <groupId>org.bindforge</groupId>
+  <artifactId>bindforge</artifactId>
+  <name>bindforge</name>
   <packaging>pom</packaging>
   <version>1.0.0</version>
 
@@ -18,13 +18,6 @@
   <modules>
     <module>common</module>
     <module>core</module>
-
-    <!--
-    Disabled until they adopted the new org.taileron name for pom parents, etc
-    <module>dsl</module>
-    <module>demo</module>
-    -->
-
     <module>assembly</module>
   </modules>
 

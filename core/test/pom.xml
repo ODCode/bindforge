@@ -1,30 +1,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>taileron.di.test</artifactId>
+	<artifactId>bindforge.di.test</artifactId>
 	<packaging>jar</packaging>
-	<name>Taileron - Core - Integration Tests</name>
+	<name>bindforge - core - integration tests</name>
     <version>1.0.0</version>
 	<parent>
-		<groupId>org.taileron</groupId>
+		<groupId>org.bindforge</groupId>
 		<artifactId>pom-it-scala</artifactId>
 		<version>1.0.0</version>
 		<relativePath>../../poms/pom-it-scala.xml</relativePath>
 	</parent>
 	<dependencies>
 		<dependency>
-			<groupId>org.taileron</groupId>
-			<artifactId>taileron.common.integrationtest</artifactId>
+			<groupId>org.bindforge</groupId>
+			<artifactId>bindforge.common.integrationtest</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.taileron</groupId>
-			<artifactId>taileron.di</artifactId>
+			<groupId>org.bindforge</groupId>
+			<artifactId>bindforge.di</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.taileron</groupId>
-			<artifactId>taileron.di.testbundle</artifactId>
+			<groupId>org.bindforge</groupId>
+			<artifactId>bindforge.di.testbundle</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 	</dependencies>

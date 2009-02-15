@@ -4,28 +4,28 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>assembly</artifactId>
     <packaging>pom</packaging>
-    <name>Taileron - Assembly</name>
+    <name>bindforge - assembly</name>
     
     <parent>
-	    <groupId>org.taileron</groupId>
-	    <artifactId>taileron</artifactId>
+	    <groupId>org.bindforge</groupId>
+	    <artifactId>bindforge</artifactId>
 	    <version>1.0.0</version>
     </parent>
 	
     <dependencies>
 	    <dependency>
-		    <groupId>org.taileron</groupId>
-		    <artifactId>taileron.di</artifactId>
+		    <groupId>org.bindforge</groupId>
+		    <artifactId>bindforge.di</artifactId>
 		    <version>1.0.0</version>
 	    </dependency>
 	    <dependency>
-		    <groupId>org.taileron</groupId>
-		    <artifactId>taileron.di.testbundle</artifactId>
+		    <groupId>org.bindforge</groupId>
+		    <artifactId>bindforge.di.testbundle</artifactId>
 		    <version>1.0.0</version>
 	    </dependency>
 	    <dependency>
-		    <groupId>org.taileron</groupId>
-		    <artifactId>taileron.scala-library</artifactId>
+		    <groupId>org.bindforge</groupId>
+		    <artifactId>bindforge.scala-library</artifactId>
 		    <version>2.7.3</version>
 	    </dependency>
         <dependency>

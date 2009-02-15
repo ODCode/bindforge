@@ -6,8 +6,8 @@
   <packaging>pom</packaging>
 
   <parent>
-    <groupId>org.taileron</groupId>
-    <artifactId>taileron</artifactId>
+    <groupId>org.bindforge</groupId>
+    <artifactId>bindforge</artifactId>
     <version>1.0.0</version>
   </parent>
 
@@ -119,7 +119,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>${pom.groupId}</groupId>
-                  <artifactId>taileron.common.integrationtest</artifactId>
+                  <artifactId>bindforge.common.integrationtest</artifactId>
                   <version>1.0.0</version>
                   <type>jar</type>
                   <overWrite>false</overWrite>

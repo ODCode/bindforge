@@ -2,14 +2,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.taileron</groupId>
-  <artifactId>taileron.common.util</artifactId>
-  <name>Taileron - Common - Util</name>
+  <groupId>org.bindforge</groupId>
+  <artifactId>bindforge.common.util</artifactId>
+  <name>bindforge - common - util</name>
   <packaging>jar</packaging>
   <version>1.0.0</version>
 
   <parent>
-    <groupId>org.taileron</groupId>
+    <groupId>org.bindforge</groupId>
     <artifactId>pom-bundle-scala</artifactId>
     <version>1.0.0</version>
     <relativePath>../../poms/pom-bundle-scala.xml</relativePath>
@@ -22,7 +22,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Export-Package>org.taileron.common.util.jcl;version="1.0.0"</Export-Package>
+            <Export-Package>org.bindforge.common.util.jcl;version="1.0.0"</Export-Package>
           </instructions>
         </configuration>
       </plugin>

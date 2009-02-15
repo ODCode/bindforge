@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>taileron.di</artifactId>
+    <artifactId>bindforge.di</artifactId>
     <packaging>jar</packaging>
-    <name>Taileron - Core</name>
+    <name>bindforge - core</name>
     <version>1.0.0</version>
     <parent>
-        <groupId>org.taileron</groupId>
+        <groupId>org.bindforge</groupId>
         <artifactId>pom-bundle-scala</artifactId>
         <version>1.0.0</version>
         <relativePath>../../poms/pom-bundle-scala.xml</relativePath>
@@ -45,9 +45,9 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>org.taileron.di.internal.Activator</Bundle-Activator>
-                        <Private-Package>org.taileron.di.internal.*</Private-Package>
-                        <Export-Package>org.taileron.di;version=${pom.version}</Export-Package>
+                        <Bundle-Activator>org.bindforge.di.internal.Activator</Bundle-Activator>
+                        <Private-Package>org.bindforge.di.internal.*</Private-Package>
+                        <Export-Package>org.bindforge.di;version=${pom.version}</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
