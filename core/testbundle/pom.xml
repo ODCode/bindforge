@@ -20,7 +20,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Private-Package>org.bindforge.di.testbundle.*</Private-Package>
+                        <Export-Package>org.bindforge.di.testbundle.*</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>

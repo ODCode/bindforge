@@ -16,6 +16,8 @@
 
 package org.bindforge.di.test.test
 
+import java.util.Hashtable
+
 import org.junit.Test
 import org.junit.Assert._
 import org.junit.runner.RunWith
@@ -32,10 +34,8 @@ import org.osgi.service.packageadmin.PackageAdmin
 
 import org.bindforge.di._
 import org.bindforge.common.integrationtest._
+import org.bindforge.di.testbundle._
 
-
-class AService {
-}
 
 @RunWith(classOf[JUnit4TestRunner])
 class BundleTest extends OSGiTest {
@@ -66,13 +66,32 @@ class BundleTest extends OSGiTest {
     val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
 
     val pa = i.getInstance(Key.get(classOf[PackageAdmin]))
-    assert(pa != null)
     assert(pa.isInstanceOf[PackageAdmin])
     assert(pa.getExportedPackages(null.asInstanceOf[Bundle]).length > 0)
   }
 
   /**
    */
+  def testServiceImportWithFilter() {
+    val p1 = new Hashtable[String, Object]
+    p1.put("testkey", "1")
+    context.registerService(classOf[IdService].getName, new IdServiceImpl("1"), p1)
+
+    val p2 = new Hashtable[String, Object]
+    p2.put("testkey", "2")
+    context.registerService(classOf[IdService].getName, new IdServiceImpl("2"), p2)
+
+    class SimpleModule extends BindingConfig {
+      bind [IdService] importService "(testkey=2)"
+    }
+    val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
+
+    val ids = i.getInstance(Key.get(classOf[IdService]))
+    assert(ids.isInstanceOf[IdService])
+    assert(ids.id == "2")
+  }
+
+  /**
   def testServiceExport() {
     class SimpleModule extends BindingConfig {
       bind [AService] spec {
@@ -85,6 +104,7 @@ class BundleTest extends OSGiTest {
       }
     }
   }
+   */
 
   /**
    */
