@@ -14,27 +14,14 @@
  * limitations under the License.
  */
 
-package org.bindforge.di.internal
+package org.bindforge.di
 
-import org.osgi.framework._
-import org.bindforge.di.BindforgeService
+trait BindforgeService {
 
+  def isBundleTracked(id: Long): Boolean
 
-class Activator extends BundleActivator {
-  
-  var bundleTracker: BundleTracker = _
-  
-  def start(context: BundleContext) {
-    val bfs = new BindforgeServiceImpl()
-    context.registerService(classOf[BindforgeService].getName, bfs, null)
-    bundleTracker = new BundleTracker(context, bfs)
-    bundleTracker.start()
-  }
+  def addTrackedBundle(id: Long): Unit
 
-  def stop(context: BundleContext) {
-    bundleTracker.stop()
-  }
-  
+  def removeTrackedBundle(id: Long): Unit
+
 }
-
-

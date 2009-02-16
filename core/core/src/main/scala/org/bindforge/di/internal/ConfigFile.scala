@@ -41,22 +41,24 @@ class ConfigFile(selfBundle: Bundle, targetBundle: Bundle, url: URL) {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
 
-  private val scanner  = new Scanner(url.openStream)
+  private val scanner = new Scanner(url.openStream)
   private val builder = new StringBuilder
 
-  private val packageName = calculatePackageName()
-  private val className = "BindingConfig"
+  //private val packageName = calculatePackageName()
+  //private val className = "BindingConfig"
+  private val packageName = "org.bindforge.di.testbundle"
+  private val className = "Module"
+
   private val FQCN = packageName + "." + className
 
-  builder.append("package " + packageName + " \n")
-  builder.append("class " + className + " extends org.bindforge.di.BindingConfig { \n");
+  //builder.append("package " + packageName + " \n")
+  //builder.append("class " + className + " extends org.bindforge.di.BindingConfig { \n");
   while (scanner.hasNextLine) {
     builder.append(scanner.nextLine + "\n")
   }
-  builder.append("\n}\n");
+  //builder.append("\n}\n");
 
   def getBindingConfigClass() {
-
     // TODO: check if class is already compiled
     val cp = getAbstractFileClassPath
     val settings = new Settings(null)
@@ -100,7 +102,7 @@ class ConfigFile(selfBundle: Bundle, targetBundle: Bundle, url: URL) {
     bundlesFs.toArray
   }
 
-  def isReadable(bundle: Bundle): boolean = {
+  def isReadable(bundle: Bundle): Boolean = {
     bundle.getResource("/") != null
   }
 

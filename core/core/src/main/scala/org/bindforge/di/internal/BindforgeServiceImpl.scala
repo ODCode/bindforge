@@ -16,25 +16,29 @@
 
 package org.bindforge.di.internal
 
-import org.osgi.framework._
-import org.bindforge.di.BindforgeService
+import scala.collection.mutable
 
 
-class Activator extends BundleActivator {
-  
-  var bundleTracker: BundleTracker = _
-  
-  def start(context: BundleContext) {
-    val bfs = new BindforgeServiceImpl()
-    context.registerService(classOf[BindforgeService].getName, bfs, null)
-    bundleTracker = new BundleTracker(context, bfs)
-    bundleTracker.start()
+class BindforgeServiceImpl extends BindforgeService {
+
+  private val bundleIds = new mutable.HashSet[Long]()
+
+  def isBundleTracked(id: Long): Boolean = {
+    bundleIds.synchronized {
+      bundleIds.contains(id)
+    }
   }
 
-  def stop(context: BundleContext) {
-    bundleTracker.stop()
+  def addTrackedBundle(id: Long): Unit = {
+    bundleIds.synchronized {
+      bundleIds.addEntry(id)
+    }
   }
-  
+
+  def removeTrackedBundle(id: Long): Unit = {
+    bundleIds.synchronized {
+      bundleIds.removeEntry(id)
+    }
+  }
+
 }
-
-

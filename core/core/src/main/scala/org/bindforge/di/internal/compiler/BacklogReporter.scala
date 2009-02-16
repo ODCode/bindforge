@@ -37,7 +37,7 @@ object BacklogReporter {
   val DEFAULT_SIZE = 50
 }
 
-class BacklogReporter(val settings: Settings, size: int) extends AbstractReporter {
+class BacklogReporter(val settings: Settings, size: Int) extends AbstractReporter {
 
   implicit def iteratorToWrapper[T](iter:java.util.Iterator[T]):IteratorWrapper[T] = new IteratorWrapper[T](iter)
 
@@ -90,12 +90,12 @@ class BacklogReporter(val settings: Settings, size: int) extends AbstractReporte
 
     private def print(pw: PrintWriter, pos: Position) {
       if (pos.source.isDefined) {
-        pw.print(pos.source.get())
+        pw.print(pos.source.get)
         pw.print(" ")
       }
       if (pos.line.isDefined) {
         pw.print("line ")
-        pw.print(pos.line.get())
+        pw.print(pos.line.get)
       }
     }
 

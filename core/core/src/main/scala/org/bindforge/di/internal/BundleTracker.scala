@@ -19,23 +19,21 @@ package org.bindforge.di.internal
 import scala.collection.mutable.HashSet
 
 import org.osgi.framework._
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 import com.google.inject.Guice
 
 import org.bindforge.di._
 
 
-class BundleTracker(context: BundleContext) extends BundleListener {
+class BundleTracker(context: BundleContext, bindforgeService: BindforgeService) extends BundleListener {
   
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   private var active = false
   
   val DEFAULT_BINDING_CONFIG_DIR = "OSGI-INF/bindforge/"
-  val DEFAULT_BINDING_CONFIG_FILE = "binding.tsc"
+  val DEFAULT_BINDING_CONFIG_FILE = "module.scala"
   
   val trackedBundles = new HashSet[Bundle]()
   
@@ -104,10 +102,12 @@ class BundleTracker(context: BundleContext) extends BundleListener {
     val url = enums.nextElement.asInstanceOf[java.net.URL]
     val cf = new ConfigFile(context.getBundle, bundle, url)
     cf.getBindingConfigClass()
+    bindforgeService.addTrackedBundle(bundle.getBundleId)
   }
 
   def stopTrackingBundle(bundle: Bundle) {
     logger.info("Closing binding configuration for bundle [{}]", bundle.getSymbolicName)
+    bindforgeService.removeTrackedBundle(bundle.getBundleId)
   }
 
 }

@@ -12,7 +12,13 @@
         <version>1.0.0</version>
         <relativePath>../../poms/pom-bundle-scala.xml</relativePath>
     </parent>
-   
+    <dependencies>
+        <dependency>
+            <groupId>org.bindforge</groupId>
+            <artifactId>bindforge.di</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>

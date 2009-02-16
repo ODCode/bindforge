@@ -43,9 +43,9 @@ class BundleTest extends OSGiTest {
   addBundle("org.bindforge", "bindforge.di", "1.0.0")
   addBundle("org.bindforge", "bindforge.di.testbundle", "1.0.0")
 
-  addBundle("org.ops4j", "peaberry", "1.0")
-  addWrappedBundle("org.ops4j.peaberry.dependencies", "guice", "2.0-SNAPSHOT")
-  addWrappedBundle("org.ops4j.peaberry.dependencies", "aopalliance", "1.0-SNAPSHOT")
+  //addBundle("org.ops4j", "peaberry", "1.0")
+  //addWrappedBundle("org.ops4j.peaberry.dependencies", "guice", "2.0-SNAPSHOT")
+  //addWrappedBundle("org.ops4j.peaberry.dependencies", "aopalliance", "1.0-SNAPSHOT")
 
   @Inject
   var context: BundleContext = _
@@ -56,6 +56,16 @@ class BundleTest extends OSGiTest {
   @Test
   def wrapper() = runScalaTest
 
+  /**
+   */
+  def waitForTestBundle() {
+    val utils = new OSGiTestUtils(context)
+    val bfs = utils.getService[BindforgeService]
+    val bid = utils.getBundleIdBySymbolicName("org.bindforge.di.testbundle")
+    while (!bfs.isBundleTracked(bid)) {
+      Thread.sleep(50)
+    }
+  }
 
   /**
    */
@@ -92,33 +102,25 @@ class BundleTest extends OSGiTest {
   }
 
   /**
+   */
   def testServiceExport() {
     class SimpleModule extends BindingConfig {
-      bind [AService] spec {
+      bind [PersonService, PersonServiceImpl] spec {
         exportService("key1" -> "value1", "key2" -> "value2")
       }
     }
     val i = Guice.createInjector(new SimpleModule().create(), Peaberry.osgiModule(context))
-    context.getAllServiceReferences(null, null).foreach{ref =>
-      ref.getPropertyKeys.foreach{key =>
-      }
-    }
+    val util = new OSGiTestUtils(context)
+    val (service, props) = util.getServiceWithProperties[PersonService]
+    assert(service != null)
+    assert(props("key1") == "value1")
+    assert(props("key2") == "value2")
   }
-   */
 
-  /**
-   */
-  def testXXX() {
-    println("starting thread to buy some time")
-    println("will be fixed soon!")
-    try {
-      Thread.sleep(3000)
-      println("done sleeping")
-    }
-    catch {
-      case _ =>
-    }
+  def testExtender() {
+    waitForTestBundle()
   }
+
 
 }
 
