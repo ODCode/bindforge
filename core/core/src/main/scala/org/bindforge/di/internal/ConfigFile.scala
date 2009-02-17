@@ -33,6 +33,7 @@ import org.osgi.framework.{Bundle, BundleContext}
 import org.osgi.service.packageadmin.PackageAdmin
 
 import org.slf4j.LoggerFactory
+import org.ops4j.pax.swissbox.core.BundleClassLoader
 
 import org.bindforge.di.internal.compiler._
 
@@ -73,8 +74,8 @@ class ConfigFile(selfBundle: Bundle, targetBundle: Bundle, url: URL) {
     }
     reporter.flush
 
-    val parentCl = classOf[ConfigFile].getClassLoader
-    val classLoader = new AbstractFileClassLoader(compiler.genJVM.outputDir, parentCl)
+    val cl = getBundleClassLoader
+    val classLoader = new AbstractFileClassLoader(compiler.genJVM.outputDir, cl)
     val script = Class.forName(FQCN, true, classLoader)
     script.newInstance
 
@@ -83,6 +84,15 @@ class ConfigFile(selfBundle: Bundle, targetBundle: Bundle, url: URL) {
 
   def getAbstractFileClassPath(): Array[AbstractFile] = {
     getBundlesForClassPath.map(getAbstractFile(_))
+  }
+
+  def getBundleClassLoader(): ClassLoader = {
+    val bundles = getBundlesForClassPath
+    var cl = new BundleClassLoader(bundles(0), classOf[ConfigFile].getClassLoader)
+    for (i <- 1 until bundles.length) {
+      cl = new BundleClassLoader(bundles(i), cl)
+    }
+    cl
   }
 
   def getBundlesForClassPath(): Array[Bundle] = {

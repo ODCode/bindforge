@@ -14,6 +14,11 @@
     </parent>
     <dependencies>
         <dependency>
+            <groupId>org.ops4j.pax.swissbox</groupId>
+            <artifactId>pax-swissbox-core</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.ops4j</groupId>
             <artifactId>peaberry</artifactId>
             <version>1.0</version>
@@ -45,15 +50,17 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
+                        <Private-Package>
+                            org.bindforge.di.internal.*,
+                            org.ops4j.pax.swissbox.core.*,
+                            org.ops4j.lang
+                        </Private-Package>
                         <Export-Package>
                             com.google.*;version="2.0",
                             org.ops4j.peaberry.*;version="1.0",
                             org.aopalliance.*;version="1.0",
                             org.bindforge.di;version="${pom.version}"
                         </Export-Package>
-                        <Bundle-Activator>
-                            org.bindforge.di.internal.Activator
-                        </Bundle-Activator>
                         <!--
                         Possibly a bug in bnd/maven-bundle-plugin/etc:
                         I need to set the version import range for the com.google
@@ -67,9 +74,9 @@
                             com.google.*;version="[2.0,3)",
                             *
                         </Import-Package>
-                        <Private-Package>
-                            org.bindforge.di.internal.*,
-                        </Private-Package>
+                        <Bundle-Activator>
+                            org.bindforge.di.internal.Activator
+                        </Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>
