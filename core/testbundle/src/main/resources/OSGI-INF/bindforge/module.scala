@@ -2,7 +2,7 @@
 package org.bindforge.di.testbundle
 
 
-class Module extends org.bindforge.di.BindingConfig {
+class BindingConfig extends org.bindforge.di.BindingConfig {
 
   println("Hello")
 

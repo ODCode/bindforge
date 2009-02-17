@@ -52,7 +52,7 @@ class ConfigFile(selfBundle: Bundle, targetBundle: Bundle, url: URL) {
 
   private val FQCN = packageName + "." + className
 
-  // FIXME
+  // FIXME  
   //builder.append("package " + packageName + " \n")
   //builder.append("class " + className + " extends org.bindforge.di.BindingConfig { \n");
   while (scanner.hasNextLine) {
