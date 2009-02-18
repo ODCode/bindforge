@@ -20,7 +20,7 @@
 	    </dependency>
 	    <dependency>
 		    <groupId>org.bindforge</groupId>
-		    <artifactId>bindforge.di.testbundle</artifactId>
+		    <artifactId>bindforge.testbundle</artifactId>
 		    <version>1.0.0</version>
 	    </dependency>
 	    <dependency>
