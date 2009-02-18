@@ -8,7 +8,7 @@
 
     <parent>
         <groupId>org.bindforge</groupId>
-        <artifactId>bindforge</artifactId>
+        <artifactId>bindforge-root</artifactId>
         <version>1.0.0</version>
     </parent>
 
