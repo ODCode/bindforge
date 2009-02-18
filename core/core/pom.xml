@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>bindforge.di</artifactId>
+    <artifactId>bindforge</artifactId>
     <packaging>jar</packaging>
     <name>bindforge - core</name>
     <version>1.0.0</version>
@@ -17,6 +17,11 @@
             <groupId>org.ops4j.pax.swissbox</groupId>
             <artifactId>pax-swissbox-core</artifactId>
             <version>0.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bindforge</groupId>
+            <artifactId>bindforge.common.util</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j</groupId>
@@ -51,19 +56,20 @@
                 <configuration>
                     <instructions>
                         <Private-Package>
-                            org.bindforge.di.internal.*,
+                            org.bindforge.internal.*,
                             org.ops4j.pax.swissbox.core.*,
-                            org.ops4j.lang
+                            org.ops4j.lang,
+                            org.bindforge.common.util.jcl
                         </Private-Package>
                         <Export-Package>
                             com.google.*;version="2.0",
                             org.ops4j.peaberry.*;version="1.0",
                             org.aopalliance.*;version="1.0",
-                            org.bindforge.di;version="${pom.version}"
+                            org.bindforge;version="${pom.version}"
                         </Export-Package>
                         <!--
                         Possibly a bug in bnd/maven-bundle-plugin/etc:
-                        I need to set the version import range for the com.google
+                        I had to set the version import range for the com.google
                         package explicitly. Otherwise bnd will generate mixed
                         import statements. Some will (correctly) use the versionpolicy,
                         other will use the version range of this maven artifact.
@@ -75,7 +81,7 @@
                             *
                         </Import-Package>
                         <Bundle-Activator>
-                            org.bindforge.di.internal.Activator
+                            org.bindforge.internal.Activator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

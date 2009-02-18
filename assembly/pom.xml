@@ -8,14 +8,14 @@
     
     <parent>
 	    <groupId>org.bindforge</groupId>
-	    <artifactId>bindforge</artifactId>
+	    <artifactId>bindforge-root</artifactId>
 	    <version>1.0.0</version>
     </parent>
 	
     <dependencies>
 	    <dependency>
 		    <groupId>org.bindforge</groupId>
-		    <artifactId>bindforge.di</artifactId>
+		    <artifactId>bindforge</artifactId>
 		    <version>1.0.0</version>
 	    </dependency>
 	    <dependency>
