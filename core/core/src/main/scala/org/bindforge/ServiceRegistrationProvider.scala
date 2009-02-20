@@ -22,8 +22,8 @@ import com.google.inject.{Provider, Inject, Injector, Key}
 
 class ServiceRegistrationProvider(
   exportBinding: ServiceExportBinding[_ <: Object],
-  iface: String,
-  key: Key[_ <: Object]) extends Provider[ServiceRegistration] {
+    iface: String,
+    key: Key[_ <: Object]) extends Provider[ServiceRegistration] {
 
   @Inject
   var injector: Injector = _
@@ -31,13 +31,17 @@ class ServiceRegistrationProvider(
   @Inject
   var context: BundleContext = _
 
-  def get(): ServiceRegistration = {
+  private var serviceRegistration: ServiceRegistration = _
+
+  private def registerService() {
     val obj = injector.getInstance(key)
-
     val props = exportBinding.properties
-    //val meth = ReflectUtils.getMethod(exportBinding.parentBinding.toType, exportBinding.propertiesMethod)
-
     context.registerService(iface, obj, props)
+  }
+
+  def get(): ServiceRegistration = {
+    if (serviceRegistration == null) registerService()
+    serviceRegistration
   }
 
 }

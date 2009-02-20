@@ -12,7 +12,6 @@ class ServiceExportBinding[A <: Object](config: Config, bindType: Class[A], val 
 extends Binding[A](config, bindType) {
 
   val properties = new Hashtable[String, Object]
-  var propertiesMethod: String = _
 
   override def create(binder: Binder) {
     // We have to create a name for this binding. Otherwise we would only bind to
@@ -30,11 +29,5 @@ extends Binding[A](config, bindType) {
   def properties(dict: Tuple2[String, Object]*) {
     dict.foreach(e => properties.put(e._1, e._2))
   }
-
-  def method(name: String) {
-    propertiesMethod = name
-  }
-
-
 
 }
