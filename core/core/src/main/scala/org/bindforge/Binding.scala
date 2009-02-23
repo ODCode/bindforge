@@ -1,3 +1,16 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.bindforge
 
@@ -9,18 +22,22 @@ import com.google.inject.name.Names
 
 abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
 
+  type SelfType <: Binding[A]
+
   var id: String = null
 
   var key: Key[_ <: Object] = null
 
   val nestedBindings = new ListBuffer[Binding[_ <: Object]]
 
+  val provider: Provider[_] = null
+
   /**
    * Assign an ID.
    */
-  def ::(id: String): Binding[A] = {
+  def ::(id: String): SelfType = {
     this.id = id
-    this
+    this.asInstanceOf[SelfType]
   }
 
   def create(binder: Binder) {
@@ -40,6 +57,11 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
     nestedBindings.foreach(_.create(binder))
   }
 
+  def addCreationCallback(callback: A => Unit) {
+    // ugly warp to get from "Any" to "A"
+    provider.addCreationCallback(a => callback(a.asInstanceOf[A]))
+  }
+
   def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
     
   }
@@ -56,7 +78,7 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
     throw new IllegalStateException("Setting 'lifecycle' not valid for bindings of type [" + this.getClass + "]")
   }
 
-  def exportService(dict: Tuple2[String, Object]*) {
+  def exportService(dict: Tuple2[String, Object]*): ServiceExportBinding[A] = {
     throw new IllegalStateException("Setting 'exportService' not valid for bindings of type [" + this.getClass + "]")
   }
 

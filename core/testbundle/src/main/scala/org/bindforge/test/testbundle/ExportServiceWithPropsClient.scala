@@ -16,14 +16,13 @@
 
 package org.bindforge.test.testbundle
 
-import org.osgi.service.packageadmin.PackageAdmin
+import org.osgi.framework.ServiceRegistration
 
 
-class PersonServiceImpl extends PersonService {
+class ExportServiceWithPropsClient {
 
-  var packageAdmin: PackageAdmin = _
+  var exportServiceWithPropsHandle: ServiceRegistration = _
 
-  def setPackageAdmin(pa: PackageAdmin) = packageAdmin = pa
-  def getPackageAdmin() = packageAdmin
+  var selfExportHandle: ServiceRegistration = _
 
 }

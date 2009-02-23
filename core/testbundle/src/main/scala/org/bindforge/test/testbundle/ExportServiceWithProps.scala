@@ -1,4 +1,6 @@
 /*
+ * Copyright 2009 Roman Roelofsen
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,16 +16,6 @@
 
 package org.bindforge.test.testbundle
 
-
-class Config extends org.bindforge.Config {
-
-  bind [ExportServiceWithProps, ExportServiceWithPropsImpl] spec {
-    "exportServiceWithPropsHandle" :: exportService("key1" -> "value1", "key2" -> "value2")
-  }
-
-  bind [ExportServiceWithPropsClient] spec {
-    property("selfExportHandle") value exportService
-    property("exportServiceWithPropsHandle") ref "exportServiceWithPropsHandle"
-  }
+trait ExportServiceWithProps {
 
 }

@@ -12,6 +12,8 @@ extends Binding[A](config, bindType) {
 
   private var _filter: String = null
 
+  override val provider: Provider[A] = null
+
   def importService {
     // dummy method to trigger implicit conversion
   }

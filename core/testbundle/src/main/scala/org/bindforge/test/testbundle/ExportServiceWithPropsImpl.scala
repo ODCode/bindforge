@@ -1,4 +1,6 @@
 /*
+ * Copyright 2009 Roman Roelofsen
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,16 +16,14 @@
 
 package org.bindforge.test.testbundle
 
+import org.osgi.service.packageadmin.PackageAdmin
 
-class Config extends org.bindforge.Config {
 
-  bind [ExportServiceWithProps, ExportServiceWithPropsImpl] spec {
-    "exportServiceWithPropsHandle" :: exportService("key1" -> "value1", "key2" -> "value2")
-  }
+class ExportServiceWithPropsImpl extends ExportServiceWithProps {
 
-  bind [ExportServiceWithPropsClient] spec {
-    property("selfExportHandle") value exportService
-    property("exportServiceWithPropsHandle") ref "exportServiceWithPropsHandle"
-  }
+  var packageAdmin: PackageAdmin = _
+
+  def setPackageAdmin(pa: PackageAdmin) = packageAdmin = pa
+  def getPackageAdmin() = packageAdmin
 
 }

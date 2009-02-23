@@ -68,11 +68,31 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
    */
   def testServiceExport() {
     val util = new OSGiTestUtils(context)
-    val (service, props) = util.getServiceWithProperties[PersonService]
-    assert(service.isInstanceOf[PersonService])
-    assert(service.isInstanceOf[PersonServiceImpl])
+    val (service, props) = util.getServiceWithProperties[ExportServiceWithProps]
+    assert(service.isInstanceOf[ExportServiceWithProps])
+    assert(service.isInstanceOf[ExportServiceWithPropsImpl])
     assert(props("key1") == "value1")
     assert(props("key2") == "value2")
+  }
+  
+  def testServiceExportOnlyOne() {
+    assert(context.getServiceReferences(classOf[ExportServiceWithProps].getName, null).length == 1)
+  }
+
+
+  def testServiceExportHandleServiceRegistration() {
+    val service = new OSGiTestUtils(context).getService[ExportServiceWithPropsClient]
+    val handle = service.exportServiceWithPropsHandle
+    assert(handle != null)
+    assert(handle.isInstanceOf[ServiceRegistration])
+    assert(handle.getReference.getProperty("key1") == "value1")
+  }
+
+  def testServiceExportSelfHandle() {
+    val service = new OSGiTestUtils(context).getService[ExportServiceWithPropsClient]
+    val handle = service.selfExportHandle
+    assert(handle != null)
+    assert(handle.isInstanceOf[ServiceRegistration])
   }
 
 }

@@ -18,7 +18,11 @@ object InjectorFactory {
         modules.foreach(binder.install(_))
       }
     }
-    Guice.createInjector(module)
+    val i = Guice.createInjector(module)
+    println("////////////////////////////////////////////////////////////////////")
+    println(i)
+    println("////////////////////////////////////////////////////////////////////")
+    i
   }
     
 }

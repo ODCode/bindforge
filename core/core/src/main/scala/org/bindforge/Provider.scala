@@ -1,6 +1,4 @@
 /*
- * Copyright 2009 Roman Roelofsen
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +12,25 @@
  * limitations under the License.
  */
 
-package org.bindforge.test.testbundle
+package org.bindforge
 
-trait PersonService {
+import scala.collection.mutable.ListBuffer
+
+
+abstract class Provider[A <: Object] extends com.google.inject.Provider[A] {
+  
+  val callbacks = new ListBuffer[A => Unit]
+
+  def addCreationCallback(callback: A => Unit) {
+    callbacks += callback
+  }
+
+  final def get(): A = {
+    val o = getInstance()
+    callbacks.foreach(_(o))
+    o
+  }
+
+  def getInstance(): A
 
 }

@@ -1,8 +1,22 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package org.bindforge
 
 import scala.collection.mutable.ListBuffer
 import java.lang.reflect.Method
+import org.slf4j.LoggerFactory
 import com.google.inject._
 import com.google.inject.name._
 
@@ -12,19 +26,20 @@ trait InjectionPoint {
 }
 
 class PropertyInjection(name: String) extends InjectionPoint {
+
+  private val logger = LoggerFactory.getLogger(this.getClass)
   
-  var ref: String = _
+  var _ref: String = _
   var _value: Any = _
   
-  def ref(ref: String): PropertyInjection = {
-    this.ref = ref
-    this
+  def ref(ref: String) {
+    _ref = ref
   }
 
   def value(value: Any) {
     _value = value
   }
-  
+
   def inject[A](clazz: Class[A], obj: A, injector: Injector) {
     // First search for a "normal" setter method
     var setterName = "set" + name.toList.head.toUpperCase + name.toList.tail
@@ -34,17 +49,37 @@ class PropertyInjection(name: String) extends InjectionPoint {
       setterName = name + "_$eq"
       methods = clazz.getMethods.filter(_.getName == setterName)
     }
+    // TODO: throw exeception if no method was found
     val setMethod: Method = methods(0)
 
-    if (_value == null) {
-      val paramType = setMethod.getParameterTypes()(0)
-      val key = if (ref == null) Key.get(paramType) else Key.get(classOf[Object], Names.named(ref))
-      val paramValue = injector.getInstance(key).asInstanceOf[Object]
-      setMethod.invoke(obj, paramValue)
+    // find the value to inject
+    var injectValue: Object = if (_value != null) {
+      _value match {
+        // if a binding was specified, register a callback to get the value
+        // of this binding's provider as soon as it is available. This is required
+        // to avoid a circular reference between this provider and the specified binding
+        case b: Binding[A] => {
+            val pi = new PropertyInjection(name)
+            b.addCreationCallback {v =>
+              pi.value(v)
+              pi.inject(clazz, obj, injector)
+            }
+            // Skip the injection for now. Will happen in the callback.
+            return
+          }
+          // Use the specified value
+        case _ => _value.asInstanceOf[Object]
+      }
     }
     else {
-      setMethod.invoke(obj, _value.asInstanceOf[Object])
+      val paramType = setMethod.getParameterTypes()(0)
+      val key = if (_ref == null) Key.get(paramType) else Key.get(classOf[Object], Names.named(_ref))
+      injector.getInstance(key).asInstanceOf[Object]
     }
+    logger.debug("Injecting property [" + name + "] of type [" + clazz.getName + "] with value [" + injectValue + "]")
+
+    // inject the value
+    setMethod.invoke(obj, injectValue)
   }
 }
 
@@ -83,7 +118,7 @@ class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
     p
   }
 
-  def get(): A = {
+  def getInstance(): A = {
     if (instance == null) {
       create()
     }
