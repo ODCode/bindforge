@@ -23,6 +23,12 @@ import com.google.inject.name._
 
 trait InjectionPoint {
   def inject[A](clazz: Class[A], obj: A, injector: Injector)
+
+  def lifecycle(callbacks: Tuple2[String, String]) {
+    println("&&&&&&&&&&&&&&&&&&&&")
+    println(callbacks._1)
+    println(callbacks._2)
+  }
 }
 
 class PropertyInjection(name: String) extends InjectionPoint {
@@ -32,12 +38,14 @@ class PropertyInjection(name: String) extends InjectionPoint {
   var _ref: String = _
   var _value: Any = _
   
-  def ref(ref: String) {
+  def ref(ref: String): PropertyInjection = {
     _ref = ref
+    this
   }
 
-  def value(value: Any) {
+  def value(value: Any): PropertyInjection = {
     _value = value
+    this
   }
 
   def inject[A](clazz: Class[A], obj: A, injector: Injector) {
@@ -58,6 +66,8 @@ class PropertyInjection(name: String) extends InjectionPoint {
         // if a binding was specified, register a callback to get the value
         // of this binding's provider as soon as it is available. This is required
         // to avoid a circular reference between this provider and the specified binding
+        // For example, this would happen if an export handle gets injected in the
+        // binding that should be exported
         case b: Binding[A] => {
             val pi = new PropertyInjection(name)
             b.addCreationCallback {v =>
