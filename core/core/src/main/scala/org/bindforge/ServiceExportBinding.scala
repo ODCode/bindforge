@@ -18,7 +18,6 @@ import java.util.Hashtable
 import com.google.inject.Binder
 import com.google.inject.Key
 import com.google.inject.name.Names
-//import org.osgi.framework.ServiceRegistration
 
 
 class ServiceExportBinding[A <: Object](config: Config, bindType: Class[A], val parentBinding: PojoBinding[A])

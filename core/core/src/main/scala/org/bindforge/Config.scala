@@ -76,5 +76,9 @@ class Config {
     currentBinding.exportService(dict: _*)
   }
 
+  def config(pid: String) {
+    new ManagedServiceConfig(currentBinding, pid)
+  }
+
 }
 

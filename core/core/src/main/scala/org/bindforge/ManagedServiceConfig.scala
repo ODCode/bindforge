@@ -14,27 +14,14 @@
 
 package org.bindforge
 
-import scala.collection.mutable.ListBuffer
-import com.google.inject.{Inject, Injector}
+import org.osgi.framework.BundleContext
 
 
-abstract class Provider[A <: Object] extends com.google.inject.Provider[A] {
+class ManagedServiceConfig[A <: Object](binding: Binding[A], pid: String) {
 
-  @Inject
-  var injector: Injector = _
-  
-  val callbacks = new ListBuffer[(Injector, A) => Unit]
-
-  def addCreationCallback(callback: (Injector, A) => Unit) {
-    callbacks += callback
+  binding.addCreationCallback {(injector, instance) =>
+    val context = injector.getInstance(classOf[BundleContext])
+    println("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO " + context)
   }
-
-  final def get(): A = {
-    val instance = getInstance()
-    callbacks.foreach(_(injector, instance))
-    instance
-  }
-
-  def getInstance(): A
 
 }

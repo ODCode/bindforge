@@ -22,9 +22,6 @@ class ServiceRegistrationProvider(exportBinding: ServiceExportBinding[_ <: Objec
                                   iface: String) extends Provider[ServiceRegistration] {
 
   @Inject
-  var injector: Injector = _
-
-  @Inject
   var context: BundleContext = _
 
   var key: Key[_ <: Object] = _

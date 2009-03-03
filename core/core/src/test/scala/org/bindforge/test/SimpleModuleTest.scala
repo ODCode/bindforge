@@ -49,7 +49,7 @@ class SimpleModuleTest {
   def testInjectValue() {
     class SimpleModule extends Config {
       bind [ServiceWithIntProperty] spec {
-        property("intProperty") value(12345) lifecycle("set", "unset")
+        property("intProperty") value 12345
       }
     }
     val m = new SimpleModule().create()

@@ -24,11 +24,10 @@ import com.google.inject.name._
 trait InjectionPoint {
   def inject[A](clazz: Class[A], obj: A, injector: Injector)
 
-  def lifecycle(callbacks: Tuple2[String, String]) {
-    println("&&&&&&&&&&&&&&&&&&&&")
-    println(callbacks._1)
-    println(callbacks._2)
-  }
+  //def lifecycle(callbacks: Tuple2[String, String]) {
+  //  println(callbacks._1)
+  //  println(callbacks._2)
+  //}
 }
 
 class PropertyInjection(name: String) extends InjectionPoint {
@@ -65,13 +64,13 @@ class PropertyInjection(name: String) extends InjectionPoint {
       _value match {
         // if a binding was specified, register a callback to get the value
         // of this binding's provider as soon as it is available. This is required
-        // to avoid a circular reference between this provider and the specified binding
+        // to avoid a circular reference between this provider and the specified binding.
         // For example, this would happen if an export handle gets injected in the
-        // binding that should be exported
+        // binding that is going to be exported
         case b: Binding[A] => {
             val pi = new PropertyInjection(name)
-            b.addCreationCallback {v =>
-              pi.value(v)
+            b.addCreationCallback {(inj: Injector, instance: A) =>
+              pi.value(instance)
               pi.inject(clazz, obj, injector)
             }
             // Skip the injection for now. Will happen in the callback.
@@ -95,9 +94,6 @@ class PropertyInjection(name: String) extends InjectionPoint {
 
 class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
   
-  @Inject
-  var injector: Injector = _
-
   private val injectionPoints = new ListBuffer[InjectionPoint]
 
   private var initMethod: Method = _

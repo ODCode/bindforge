@@ -57,9 +57,9 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
     nestedBindings.foreach(_.create(binder))
   }
 
-  def addCreationCallback(callback: A => Unit) {
+  def addCreationCallback(callback: (Injector, A) => Unit) {
     // ugly warp to get from "Any" to "A"
-    provider.addCreationCallback(a => callback(a.asInstanceOf[A]))
+    provider.addCreationCallback((injector, obj) => callback(injector, obj.asInstanceOf[A]))
   }
 
   def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
