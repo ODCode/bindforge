@@ -14,20 +14,6 @@
 
 package org.bindforge.test.testbundle
 
-
-class Config extends org.bindforge.Config {
-
-  bind [ExportServiceWithProps, ExportServiceWithPropsImpl] spec {
-    "exportServiceWithPropsHandle" :: exportService("key1" -> "value1", "key2" -> "value2")
-  }
-
-  bind [ExportServiceWithPropsClient] spec {
-    property("selfExportHandle") value exportService
-    property("exportServiceWithPropsHandle") ref "exportServiceWithPropsHandle"
-  }
-
-  bind [ServiceWithConfig] spec {
-    config("servicewithconfig.pid")
-  }
+class ServiceWithConfig {
 
 }

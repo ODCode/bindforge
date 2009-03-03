@@ -14,14 +14,31 @@
 
 package org.bindforge
 
+import scala.collection.mutable.ListBuffer
 import org.osgi.framework.BundleContext
+import org.osgi.service.cm.ManagedService
+
+
+class ManagedServiceImpl extends ManagedService {
+
+  def updated(dict: java.util.Dictionary[_, _]) {
+    println("got new config: " + dict)
+  }
+  
+}
+
+object ManagedServices {
+  def abc = ""
+}
 
 
 class ManagedServiceConfig[A <: Object](binding: Binding[A], pid: String) {
 
   binding.addCreationCallback {(injector, instance) =>
     val context = injector.getInstance(classOf[BundleContext])
-    println("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO " + context)
+
+
+    println("OOOO " + context + "PID: " + pid)
   }
 
 }

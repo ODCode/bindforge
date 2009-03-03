@@ -24,7 +24,7 @@ class Config {
   
   val bindings = new ListBuffer[Binding[_]]
   
-  var currentBinding: Binding[_] = _
+  var currentBinding: Binding[_ <: Object] = _
 
   def create(): Module = new Module() {
     def configure(binder: Binder) {
