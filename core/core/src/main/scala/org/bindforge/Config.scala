@@ -77,8 +77,13 @@ class Config {
   }
 
   def config(pid: String) {
-    new ManagedServiceConfig(currentBinding, pid)
+    config(pid, null)
   }
+
+  def config(pid: String, updateMethod: String) {
+    new ManagedServiceConfig(currentBinding, pid, updateMethod)
+  }
+
 
 }
 

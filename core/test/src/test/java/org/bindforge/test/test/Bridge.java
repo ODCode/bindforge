@@ -12,22 +12,20 @@
  * limitations under the License.
  */
 
-package org.bindforge.test.testbundle
+package org.bindforge.test.test;
+
+import org.ops4j.pax.exam.container.def.options.ProfileOption;
+import org.ops4j.pax.exam.container.def.PaxRunnerOptions;
 
 
-class Config extends org.bindforge.Config {
+public class Bridge {
 
-  bind [ExportServiceWithProps, ExportServiceWithPropsImpl] spec {
-    "exportServiceWithPropsHandle" :: exportService("key1" -> "value1", "key2" -> "value2")
-  }
+    public static ProfileOption profile(String name) {
+        return PaxRunnerOptions.profile(name);
+    }
 
-  bind [ExportServiceWithPropsClient] spec {
-    property("selfExportHandle") value exportService
-    property("exportServiceWithPropsHandle") ref "exportServiceWithPropsHandle"
-  }
-
-  bind [ServiceWithConfig] spec {
-    config("servicewithconfig.pid", "updated")
-  }
+    public static ProfileOption configProfile() {
+        return PaxRunnerOptions.configProfile();
+    }
 
 }

@@ -21,13 +21,12 @@ import com.google.inject._
 import com.google.inject.name._
 
 
+class NoSetterForPropertyException(clazz: Class[_], name: String)
+extends Exception("No setter method for property [" + clazz.getName + "#" + name + "] was found")
+
+
 trait InjectionPoint {
   def inject[A](clazz: Class[A], obj: A, injector: Injector)
-
-  //def lifecycle(callbacks: Tuple2[String, String]) {
-  //  println(callbacks._1)
-  //  println(callbacks._2)
-  //}
 }
 
 class PropertyInjection(name: String) extends InjectionPoint {
@@ -49,15 +48,18 @@ class PropertyInjection(name: String) extends InjectionPoint {
 
   def inject[A](clazz: Class[A], obj: A, injector: Injector) {
     // First search for a "normal" setter method
-    var setterName = "set" + name.toList.head.toUpperCase + name.toList.tail
+    var setterName = ("set" :: name.toList.head.toUpperCase :: name.toList.tail).mkString
     var methods = clazz.getMethods.filter(_.getName == setterName)
     // If none was found, check for a "scala-like" setter method
     if (methods.length == 0) {
       setterName = name + "_$eq"
       methods = clazz.getMethods.filter(_.getName == setterName)
     }
-    // TODO: throw exeception if no method was found
+    if (methods.length == 0) {
+      throw new NoSetterForPropertyException(clazz, name)
+    }
     val setMethod: Method = methods(0)
+    logger.debug("Injecting [{}] with method [{}]", clazz.getName + "#" + name, setterName)
 
     // find the value to inject
     var injectValue: Object = if (_value != null) {
@@ -85,7 +87,6 @@ class PropertyInjection(name: String) extends InjectionPoint {
       val key = if (_ref == null) Key.get(paramType) else Key.get(classOf[Object], Names.named(_ref))
       injector.getInstance(key).asInstanceOf[Object]
     }
-    logger.debug("Injecting property [" + name + "] of type [" + clazz.getName + "] with value [" + injectValue + "]")
 
     // inject the value
     setMethod.invoke(obj, injectValue)
@@ -108,12 +109,7 @@ class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
   def getMethod(methodName: String, defaultName: String): Method = {
     if (methodName != null) {
       val m = ReflectUtils.getMethod(binding.toType, methodName)
-      if (m == null) {
-        throw new IllegalStateException("Method with name [" + methodName + "] is not defined in class [" + binding.toType.getName + "]")
-      }
-      else {
-        return m
-      }
+      return m
     }
     return null
   }

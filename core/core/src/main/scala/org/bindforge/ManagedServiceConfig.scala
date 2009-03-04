@@ -14,31 +14,96 @@
 
 package org.bindforge
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
+import com.google.inject.Injector
 import org.osgi.framework.BundleContext
 import org.osgi.service.cm.ManagedService
+import org.slf4j.LoggerFactory
+
+import org.bindforge.common.util.jcl.Conversions._
 
 
-class ManagedServiceImpl extends ManagedService {
+class ManagedTarget(val obj: Object, val updateMethod: String, val injector: Injector)
+
+class ManagedServiceImpl(pid: String) extends ManagedService {
+
+  private val logger = LoggerFactory.getLogger(this.getClass)
+  
+  val targets = new mutable.HashSet[ManagedTarget]
 
   def updated(dict: java.util.Dictionary[_, _]) {
-    println("got new config: " + dict)
+    if (dict == null) return
+    val config = mutable.HashMap.empty[String, Any]
+    dict.keys.foreach(k => config(k.asInstanceOf[String]) = dict.get(k))
+    applyConfig(config.elements)
+  }
+
+  def applyConfig(config: Iterator[(String, Any)]) {
+    targets.foreach {target =>
+      val obj = target.obj
+      val updateMethod = target.updateMethod
+      val injector = target.injector
+      
+      logger.debug("Applying configuration change for PID [{}] in object [{}]", pid, obj)
+      config.foreach {configEntry =>
+        val (key, value) = configEntry
+        val pi = new PropertyInjection(key)
+        pi.value(value)
+        try {
+          pi.inject(obj.getClass.asInstanceOf[Class[Any]], obj, injector)
+        }
+        catch {
+          case e: NoSetterForPropertyException => // Ignore
+        }
+      }
+
+      if (updateMethod == null) return
+      val clazz = obj.getClass
+      logger.debug("Calling update method [{}#{}]", clazz.getName, updateMethod)
+      val method = ReflectUtils.getMethod(clazz, updateMethod)
+      method.getParameterTypes match {
+        case _ => method.invoke(obj, null)
+      }
+    }
+  }
+
+  def addConfigurationTarget(target: Object, updateMethod: String, injector: Injector) {
+    targets += new ManagedTarget(target, updateMethod, injector)
   }
   
 }
 
-object ManagedServices {
-  def abc = ""
+
+object ManagedServiceStore {
+  
+  private val logger = LoggerFactory.getLogger(this.getClass)
+
+  val managedServices = mutable.HashMap.empty[String, ManagedServiceImpl]
+
+  def getManagedService(pid: String, context: BundleContext): ManagedServiceImpl = {
+    managedServices.getOrElseUpdate(pid, {
+        logger.debug("Creating ManagedService for PID [{}]", pid)
+        val ms = new ManagedServiceImpl(pid)
+        val map = Map("service.pid" -> pid)
+        context.registerService(classOf[ManagedService].getName, ms, map)
+        ms
+      })
+  }
+
+  def addConfigurationTarget(pid: String, target: Object, updateMethod: String, injector: Injector) {
+    val context = injector.getInstance(classOf[BundleContext])
+    val ms = getManagedService(pid, context)
+    logger.debug("Adding object [{}] as configuration target for PID [{}]", target, pid)
+    ms.addConfigurationTarget(target, updateMethod, injector)
+  }
+  
 }
 
 
-class ManagedServiceConfig[A <: Object](binding: Binding[A], pid: String) {
+class ManagedServiceConfig[A <: Object](binding: Binding[A], pid: String, updateMethod: String) {
 
   binding.addCreationCallback {(injector, instance) =>
-    val context = injector.getInstance(classOf[BundleContext])
-
-
-    println("OOOO " + context + "PID: " + pid)
+    ManagedServiceStore.addConfigurationTarget(pid, instance, updateMethod, injector)
   }
 
 }

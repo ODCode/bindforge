@@ -24,7 +24,7 @@ object ReflectUtils {
   def getMethod(clazz: Class[_], name: String): Method = {
     val methods = clazz.getMethods.filter(_.getName == name)
     if (methods.size == 0) {
-      return null
+      throw new IllegalArgumentException("Class [" + clazz + "] does not have the method [" + name + "]")
     }
     else {
       return methods(0)

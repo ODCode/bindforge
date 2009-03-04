@@ -14,6 +14,19 @@
 
 package org.bindforge.test.testbundle
 
+
 class ServiceWithConfig {
+
+  var username: String = _
+
+  var _password: String = _
+  def setPassword(password: String) = _password = password
+  def getPassword() = _password
+  
+  var complexVarName: String = _
+
+  var updateCalled = false
+
+  def updated() = updateCalled = true
 
 }

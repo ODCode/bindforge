@@ -22,6 +22,7 @@ import org.junit.runner.RunWith
 import org.ops4j.pax.exam.Inject
 import org.ops4j.pax.exam.junit.JUnit4TestRunner
 import org.ops4j.pax.exam.junit.Configuration
+import org.ops4j.pax.exam.CoreOptions.options
 
 import org.osgi.framework.BundleContext
 
@@ -33,12 +34,13 @@ class BundleTest extends OSGiTest {
 
   addBundle("org.bindforge", "bindforge", "1.0.0")
   addBundle("org.bindforge", "bindforge.testbundle", "1.0.0")
+  addBundle("org.bindforge", "bindforge.common.util", "1.0.0")
 
   @Inject
   var context: BundleContext = _
 
   @Configuration
-  def config() = baseConfiguration
+  def config() = options((Bridge.configProfile :: this.baseConfiguration).toArray: _*)
 
   @Test
   def wrapper() = {

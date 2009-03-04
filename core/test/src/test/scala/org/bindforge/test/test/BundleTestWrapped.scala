@@ -24,7 +24,9 @@ import org.scalatest.Suite
 
 import org.osgi.framework._
 import org.osgi.service.packageadmin.PackageAdmin
+import org.osgi.service.cm.{Configuration, ConfigurationAdmin}
 
+import org.bindforge.common.util.jcl.Conversions._
 import org.bindforge.common.integrationtest.OSGiTestUtils
 import org.bindforge.test.testbundle._
 
@@ -93,6 +95,12 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
     val handle = service.selfExportHandle
     assert(handle != null)
     assert(handle.isInstanceOf[ServiceRegistration])
+  }
+
+  def testConfigAdmin() {
+    val service = new OSGiTestUtils(context).getService[ConfigurationAdmin]
+    val conf = service.getConfiguration("servicewithconfig.pid", null)
+    conf.update(Map("username" -> "Joe", "password" -> "secret", "complex.var.name" -> "value"))
   }
 
 }
