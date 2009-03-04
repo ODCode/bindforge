@@ -98,9 +98,23 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
   }
 
   def testConfigAdmin() {
-    val service = new OSGiTestUtils(context).getService[ConfigurationAdmin]
-    val conf = service.getConfiguration("servicewithconfig.pid", null)
-    conf.update(Map("username" -> "Joe", "password" -> "secret", "complex.var.name" -> "value"))
+    val util = new OSGiTestUtils(context)
+    val service = util.getService[ServiceWithConfig]
+    val configAdmin = util.getService[ConfigurationAdmin]
+    val conf = configAdmin.getConfiguration("servicewithconfig.pid", null)
+
+    var configureFired = false
+    while (service.lastConfig == null) {
+      if (!configureFired) {
+        conf.update(Map("username" -> "Joe", "password" -> "secret", "complex.var.name" -> "value"))
+        configureFired = true
+      }
+      Thread.sleep(50)
+    }
+    assert(service.username === "Joe")
+    assert(service.getPassword === "secret")
+    assert(service.lastConfig.get("username") === service.username)
+    assert(service.lastConfig.get("password") === service.getPassword)
   }
 
 }

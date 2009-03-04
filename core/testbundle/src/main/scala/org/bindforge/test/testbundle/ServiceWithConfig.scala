@@ -25,8 +25,8 @@ class ServiceWithConfig {
   
   var complexVarName: String = _
 
-  var updateCalled = false
+  var lastConfig: java.util.Map[String, _] = null
 
-  def updated() = updateCalled = true
+  def updated(config: java.util.Map[String, _]) = lastConfig = config
 
 }

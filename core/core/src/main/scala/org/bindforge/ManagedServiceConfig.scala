@@ -45,8 +45,12 @@ class ManagedServiceImpl(pid: String) extends ManagedService {
       val injector = target.injector
       
       logger.debug("Applying configuration change for PID [{}] in object [{}]", pid, obj)
+      
+      // create a Java dict that we can pass to the updated method later
+      val javaConfig: java.util.Map[String, Object] = new java.util.HashMap[String, Object]
       config.foreach {configEntry =>
         val (key, value) = configEntry
+        javaConfig.put(key, value.asInstanceOf[Object])
         val pi = new PropertyInjection(key)
         pi.value(value)
         try {
@@ -61,8 +65,12 @@ class ManagedServiceImpl(pid: String) extends ManagedService {
       val clazz = obj.getClass
       logger.debug("Calling update method [{}#{}]", clazz.getName, updateMethod)
       val method = ReflectUtils.getMethod(clazz, updateMethod)
-      method.getParameterTypes match {
-        case _ => method.invoke(obj, null)
+      type MapClass = Class[java.util.Map[String, Object]]
+      method.getParameterTypes.toList match {
+        case List(a: MapClass) => method.invoke(obj, javaConfig)
+        case Nil => method.invoke(obj, null)
+        case _ => throw new Exception("Update method [" + clazz.getName + "#" + method.getName + "] does not have a supported signature. " +
+                                      "Supported are: a) No parameters and b) 1 parameter of type 'java.util.Map[String, Object]'.")
       }
     }
   }

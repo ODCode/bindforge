@@ -49,7 +49,7 @@ class OSGiTest extends Suite {
 
   def baseConfiguration(): List[Option] = {
     List(
-      frameworks(CoreOptions.equinox()),
+      frameworks(CoreOptions.felix()),
         provision(bundles.toArray: _*)
       );
   }

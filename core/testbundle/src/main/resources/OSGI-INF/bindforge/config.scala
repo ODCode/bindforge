@@ -27,6 +27,7 @@ class Config extends org.bindforge.Config {
   }
 
   bind [ServiceWithConfig] spec {
+    exportService
     config("servicewithconfig.pid", "updated")
   }
 
