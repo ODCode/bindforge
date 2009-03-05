@@ -30,20 +30,44 @@ class ClientWithAnnotation {
 
 class ClientWithoutAnnotation {
   
-  var myService: MyService = _
+  var _myService: MyService = _
   
   def setMyService(myService: MyService) {
-    this.myService = myService
+    this._myService = myService
   }
   
-  def getMyService(): MyService = myService
+  def getMyService(): MyService = _myService
 }
 
-class ServiceWithIntProperty {
+class ServiceWithProperties {
 
-  var intProperty: Int = _
+  var intp: Int = _
+  var stringp: String = _
+  var listp: java.util.List[String] = _
 
-  def setIntProperty(i: Int) = intProperty = i
-  def getIntProperty() = intProperty
 }
+
+
+trait NestedA
+class NestedAImpl1 extends NestedA
+class NestedAImpl2 extends NestedA {
+  var value: String = _
+}
+
+class NestedB {
+  var nestedA1: NestedA = _
+  var nestedA2: NestedA = _
+}
+
+
+
+
+
+
+
+
+
+
+
+
 

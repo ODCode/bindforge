@@ -39,7 +39,7 @@ extends Binding[A](config, bindType) {
 
   private var exportServiceDict: Map[String, Object] = null
 
-  override def spec(block: => Unit) {
+  override def spec(block: => Unit): Binding[A] = {
     config.specStack.push(this)
     block
     config.specStack.pop

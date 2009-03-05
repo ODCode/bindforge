@@ -48,7 +48,7 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
       throw new NoSetterForPropertyException(clazz, name)
     }
     val setMethod: Method = methods(0)
-    logger.debug("Injecting [{}] with method [{}]", clazz.getName + "#" + name, setterName)
+    val paramType: Class[Object] = setMethod.getParameterTypes()(0).asInstanceOf[Class[Object]]
 
     // find the value to inject
     var injectValue: Object = value match {
@@ -70,8 +70,8 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
         val key = Key.get(classOf[Object], Names.named(s.name))
         injector.getInstance(key).asInstanceOf[Object]
 
+      // Lookup the value
       case InjectWithType =>
-        val paramType = setMethod.getParameterTypes()(0)
         val key = Key.get(paramType)
         injector.getInstance(key).asInstanceOf[Object]
 
@@ -80,6 +80,7 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
     }
 
     // inject the value
+    logger.debug("Injecting [{}] with method [{}] and value [{}]", Array(clazz.getName + "#" + name, setterName, injectValue))
     setMethod.invoke(obj, injectValue)
   }
 }

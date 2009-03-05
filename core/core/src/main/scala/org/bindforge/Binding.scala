@@ -93,7 +93,7 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
     provider.addCreationCallback((injector, obj) => callback(injector, obj.asInstanceOf[A]))
   }
 
-  def spec(block: => Unit) {
+  def spec(block: => Unit): Binding[A] = {
     throw new IllegalStateException("Block settings are not valid for bindings of type [" + this.getClass + "]")
   }
 

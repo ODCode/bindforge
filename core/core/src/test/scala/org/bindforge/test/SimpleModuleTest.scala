@@ -9,6 +9,7 @@ import org.osgi.service.packageadmin.PackageAdmin
 
 class SimpleModuleTest {
 
+  /*
   @Test
   def testSimpleBind() {
     class SimpleModule extends Config {
@@ -48,16 +49,20 @@ class SimpleModuleTest {
   @Test
   def testInjectValue() {
     class SimpleModule extends Config {
-      bind [ServiceWithIntProperty] spec {
-        property("intProperty") = 12345
+      bind [ServiceWithProperties] spec {
+        property("intp") = 123
+        property("stringp") = "abc"
+        property("listp") = new java.util.ArrayList[String]()
       }
     }
     val m = new SimpleModule().create()
     val i = Guice.createInjector(m)
 
-    val ser = i.getInstance(Key.get(classOf[ServiceWithIntProperty]))
+    val ser = i.getInstance(Key.get(classOf[ServiceWithProperties]))
     assertTrue(ser != null)
-    assertTrue(ser.getIntProperty == 12345)
+    assertTrue(ser.intp == 123)
+    assertTrue(ser.stringp == "abc")
+    assertTrue(ser.listp.isInstanceOf[java.util.ArrayList[String]])
   }
 
   @Test
@@ -130,6 +135,28 @@ class SimpleModuleTest {
     catch {
       case e: Exception =>
     }
+  }
+  */
+
+  @Test
+  def testNestedBindings() {
+    class SimpleModule extends Config {
+      bind [NestedA, NestedAImpl1]
+      bind [NestedB] spec {
+        property("nestedA1")
+        property("nestedA2") = bind [NestedAImpl2] spec {
+          property("value") = "the_value"
+        }
+      }
+    }
+    val i = InjectorFactory.createInjector(new SimpleModule())
+    val na1 = i.getInstance(Key.get(classOf[NestedA]))
+    val na2 = i.getInstance(Key.get(classOf[NestedAImpl2]))
+    val nb = i.getInstance(Key.get(classOf[NestedB]))
+
+    assert(nb.nestedA1 == na1)
+    assert(nb.nestedA2 == na2)
+    assert(na2.value == "the_value")
   }
 
 }
