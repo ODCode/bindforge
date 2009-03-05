@@ -20,6 +20,5 @@ import com.google.inject.name.Names;
 public class MyModuleA implements Module {
     public void configure(Binder b) {
         b.bind(String.class).annotatedWith(Names.named("String_1")).to(String.class);
-        b.bind(String.class).annotatedWith(Names.named("String_2")).to(String.class);
     }
 }

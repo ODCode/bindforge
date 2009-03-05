@@ -19,7 +19,6 @@ import com.google.inject.name.Names;
 
 public class MyModuleB implements Module {
     public void configure(Binder b) {
-        b.bind(String.class).annotatedWith(Names.named("String_3")).to(String.class);
-        b.bind(String.class).annotatedWith(Names.named("String_4")).to(String.class);
+        b.bind(String.class).annotatedWith(Names.named("String_2")).to(String.class);
     }
 }

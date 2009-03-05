@@ -180,12 +180,8 @@ class SimpleModuleTest {
     val i = InjectorFactory.createInjector(new SimpleModule())
     val s1 = i.getInstance(Key.get(classOf[String], Names.named("String_1")))
     val s2 = i.getInstance(Key.get(classOf[String], Names.named("String_2")))
-    val s3 = i.getInstance(Key.get(classOf[String], Names.named("String_3")))
-    val s4 = i.getInstance(Key.get(classOf[String], Names.named("String_4")))
     assertTrue(s1.isInstanceOf[String])
     assertTrue(s2.isInstanceOf[String])
-    assertTrue(s3.isInstanceOf[String])
-    assertTrue(s4.isInstanceOf[String])
   }
 
 }
