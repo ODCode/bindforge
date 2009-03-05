@@ -1,0 +1,5 @@
+- overwork lifecycle code
+    - bad implementation currently
+    - name/""/null not stable enough
+    - destroy not working
+
