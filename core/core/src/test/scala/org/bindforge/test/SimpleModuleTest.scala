@@ -9,7 +9,6 @@ import org.osgi.service.packageadmin.PackageAdmin
 
 class SimpleModuleTest {
 
-  /*
   @Test
   def testSimpleBind() {
     class SimpleModule extends Config {
@@ -62,7 +61,7 @@ class SimpleModuleTest {
     assertTrue(ser != null)
     assertTrue(ser.intp == 123)
     assertTrue(ser.stringp == "abc")
-    assertTrue(ser.listp.isInstanceOf[java.util.ArrayList[String]])
+    assertTrue(ser.listp.isInstanceOf[java.util.ArrayList[_]])
   }
 
   @Test
@@ -136,7 +135,6 @@ class SimpleModuleTest {
       case e: Exception =>
     }
   }
-  */
 
   @Test
   def testNestedBindings() {
