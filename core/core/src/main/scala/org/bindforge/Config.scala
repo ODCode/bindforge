@@ -29,12 +29,25 @@ class Config {
 
   def addBinding(b: Binding[_ <: Object]) {
     bindings += b
+  }
+
+  def removeBinding(b: Binding[_ <: Object]) {
+    bindings.remove(bindings.indexOf(b))
+  }
+
+  def increaseTypeCounter(b: Binding[_ <: Object]) {
     typeCounter(b.bindType) = typeCounter.getOrElseUpdate(b.bindType, 0) + 1
+  }
+
+  def decreaseTypeCounter(b: Binding[_ <: Object]) {
+    typeCounter(b.bindType) = typeCounter(b.bindType) - 1
   }
 
   def create(): Module = new Module() {
     def configure(binder: Binder) {
+      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
       bindings.foreach(_.create(binder))
+      println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     }
   }
   
@@ -51,13 +64,16 @@ class Config {
       newBinding = new PojoBinding[A](this, from, toType.erasure.asInstanceOf[Class[B]])
     }
     addBinding(newBinding)
+    increaseTypeCounter(newBinding)
     newBinding
   }
 
   implicit def binding2serviceImport[A <: Object](binding: Binding[A]): ServiceBinding[A] = {
-    bindings.remove(bindings.indexOf(binding))
+    removeBinding(binding)
+    decreaseTypeCounter(binding)
     val newB = new ServiceBinding(this, binding.bindType)
     addBinding(newB)
+    increaseTypeCounter(newB)
     newB
   }
 
@@ -73,12 +89,12 @@ class Config {
     currentBinding.property(name)
   }
 
-  def exportService: ServiceExportBinding[_] = {
+  def exportService: ServiceExportBinding = {
     // pass empty list
     currentBinding.exportService(List[Tuple2[String, Object]](): _*)
   }
 
-  def exportService(dict: Tuple2[String, Object]*): ServiceExportBinding[_] = {
+  def exportService(dict: Tuple2[String, Object]*): ServiceExportBinding = {
     currentBinding.exportService(dict: _*)
   }
 

@@ -18,20 +18,17 @@ import org.osgi.framework.{BundleContext, ServiceRegistration}
 import com.google.inject.{Inject, Injector, Key}
 
 
-class ServiceRegistrationProvider(exportBinding: ServiceExportBinding[_ <: Object],
-                                  iface: String) extends Provider[ServiceRegistration] {
+class ServiceRegistrationProvider(exportBinding: ServiceExportBinding) extends Provider[ServiceRegistration] {
 
   @Inject
   var context: BundleContext = _
 
-  var key: Key[_ <: Object] = _
-
   private var serviceRegistration: ServiceRegistration = _
 
   private def registerService() {
-    val obj = injector.getInstance(key)
+    val obj = injector.getInstance(exportBinding.parentBinding.key)
     val props = exportBinding.properties
-    serviceRegistration = context.registerService(iface, obj, props)
+    serviceRegistration = context.registerService(exportBinding.parentBinding.bindType.getName, obj, props)
   }
 
   def getInstance(): ServiceRegistration = {

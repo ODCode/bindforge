@@ -20,7 +20,7 @@ class SimpleModuleTest {
     assertTrue(myi != null)
   }
 
-  
+
   @Test
   def testFromAndToType() {
     class SimpleModule extends Config {
@@ -87,7 +87,7 @@ class SimpleModuleTest {
     val client = i.getInstance(Key.get(classOf[ClientWithoutAnnotation]))
     assertTrue(client.getMyService != null)
   }
-
+  
   @Test
   def testInjectionWithBlockKnownName() {
     class SimpleModule extends Config {
@@ -131,6 +131,5 @@ class SimpleModuleTest {
       case e: Exception =>
     }
   }
-
 
 }

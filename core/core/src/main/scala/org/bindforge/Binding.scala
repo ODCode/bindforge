@@ -14,10 +14,11 @@
 
 package org.bindforge
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{HashMap, ListBuffer}
 import com.google.inject._
 import com.google.inject.binder._
 import com.google.inject.name.Names
+import org.osgi.framework.ServiceRegistration
 
 
 abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
@@ -41,18 +42,56 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
   }
 
   def create(binder: Binder) {
-    // if an ID was provided
+    /*
+     // if an ID was provided
+     if (id != null) {
+     val binding = binder.bind(classOf[Object]).annotatedWith(Names.named(id))
+     key = Key.get(classOf[Object], Names.named(id))
+     bindTarget(binder, binding)
+     }
+     else {
+     // Standard From type binding
+     val binding = binder.bind(bindType)
+     key = Key.get(bindType)
+     bindTarget(binder, binding)
+     }
+     */
+
+    // if an ID was specified, bind to (Object, ID)
+    println("... >>>>>>>>>>>>")
+    println("... for Binding: " + this.bindType + " with ID: " + this.id)
+    println("... ...")
     if (id != null) {
       val binding = binder.bind(classOf[Object]).annotatedWith(Names.named(id))
+      bindTarget(binder, binding)
       key = Key.get(classOf[Object], Names.named(id))
-      bindTarget(binder, binding)
+
+      if (key != null) println("... Binded with key " + key)
     }
-    else {
-      // Standard From type binding
+    // if only one binding for this type was specified, bind directly to this type
+    if (config.typeCounter(bindType) == 1) {
       val binding = binder.bind(bindType)
-      key = Key.get(bindType)
       bindTarget(binder, binding)
+      key = Key.get(bindType)
+
+      if (key != null) println("... Binded with key " + key)
     }
+    // if non of the above "rules" applied, bind and generate a unique ID
+    if (key == null) {
+      id = bindType.getClass.getName + this.hashCode.toString
+      val binding = binder.bind(classOf[Object]).annotatedWith(Names.named(id))
+      bindTarget(binder, binding)
+      key = Key.get(bindType, Names.named(id))
+
+      if (key != null) println("... Binded with key " + key)
+    }
+    println("... to Provider: " + provider)
+    println("... ...")
+    println("... Binding list: " + config.bindings.map(_.bindType.getName).mkString(";"))
+    println("... No of same type: " + config.typeCounter(bindType))
+    println("... <<<<<<<<<<<<")
+    
+
     nestedBindings.foreach(_.create(binder))
   }
 
@@ -62,7 +101,6 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
   }
 
   def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
-    
   }
 
   def spec(block: => Unit) {
@@ -77,7 +115,7 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
     throw new IllegalStateException("Setting 'lifecycle' not valid for bindings of type [" + this.getClass + "]")
   }
 
-  def exportService(dict: Tuple2[String, Object]*): ServiceExportBinding[A] = {
+  def exportService(dict: Tuple2[String, Object]*): ServiceExportBinding = {
     throw new IllegalStateException("Setting 'exportService' not valid for bindings of type [" + this.getClass + "]")
   }
 

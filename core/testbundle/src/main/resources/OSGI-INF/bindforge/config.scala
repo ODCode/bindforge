@@ -21,6 +21,7 @@ class Config extends org.bindforge.Config {
     "exportServiceWithPropsHandle" :: exportService("key1" -> "value1", "key2" -> "value2")
   }
 
+  /*
   bind [ExportServiceWithPropsClient] spec {
     property("selfExportHandle") value exportService
     property("exportServiceWithPropsHandle") ref "exportServiceWithPropsHandle"
@@ -30,5 +31,6 @@ class Config extends org.bindforge.Config {
     exportService
     config("servicewithconfig.pid", "updated")
   }
+  */
 
 }

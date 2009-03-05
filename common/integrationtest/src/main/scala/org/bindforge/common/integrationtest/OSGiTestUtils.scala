@@ -23,11 +23,17 @@ class OSGiTestUtils(context: BundleContext) {
 
   def getService[A <: Object](implicit clazz: Manifest[A]): A = {
     val ref = context.getServiceReference(clazz.erasure.getName)
+    if (ref == null) {
+      throw new IllegalStateException("No service registration for type [" + clazz.erasure.getName + "] available!")
+    }
     context.getService(ref).asInstanceOf[A]
   }
 
   def getServiceWithProperties[A <: Object](implicit clazz: Manifest[A]): (A, scala.collection.Map[String, Object]) = {
     val ref = context.getServiceReference(clazz.erasure.getName)
+    if (ref == null) {
+      throw new IllegalStateException("No service registration for type [" + clazz.erasure.getName + "] available!")
+    }
     val dict = new mutable.HashMap[String, Object]()
     ref.getPropertyKeys.foreach(k => dict.put(k, ref.getProperty(k)))
     (context.getService(ref).asInstanceOf[A], dict)

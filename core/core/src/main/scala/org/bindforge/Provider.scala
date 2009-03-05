@@ -18,7 +18,7 @@ import scala.collection.mutable.ListBuffer
 import com.google.inject.{Inject, Injector}
 
 
-abstract class Provider[A <: Object] extends com.google.inject.Provider[A] {
+abstract class Provider[A] extends com.google.inject.Provider[A] {
 
   @Inject
   var injector: Injector = _

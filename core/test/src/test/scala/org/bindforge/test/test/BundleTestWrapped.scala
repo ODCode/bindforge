@@ -33,8 +33,6 @@ import org.bindforge.test.testbundle._
 
 class BundleTestWrapped(context: BundleContext) extends Suite {
 
-  /**
-   */
   def testServiceImport() {
     class SimpleModule extends Config {
       bind [PackageAdmin] importService
@@ -46,7 +44,6 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
   }
 
   /**
-   */
   def testServiceImportWithFilter() {
     val p1 = new Hashtable[String, Object]
     p1.put("testkey", "1")
@@ -66,8 +63,6 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
     assert(ids.id == "2")
   }
 
-  /**
-   */
   def testServiceExport() {
     val util = new OSGiTestUtils(context)
     val (service, props) = util.getServiceWithProperties[ExportServiceWithProps]
@@ -116,6 +111,8 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
     assert(service.lastConfig.get("username") === service.username)
     assert(service.lastConfig.get("password") === service.getPassword)
   }
+
+*/
 
 }
 

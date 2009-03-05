@@ -58,8 +58,9 @@ extends Binding[A](config, bindType) {
     provider.setInitAndDestroy(init, destroy)
   }
   
-  override def exportService(dict: Tuple2[String, Object]*): ServiceExportBinding[A] = {
-    val seb = new ServiceExportBinding(config, bindType, this)
+  override def exportService(dict: Tuple2[String, Object]*): ServiceExportBinding = {
+    val seb = new ServiceExportBinding(config, this)
+    config.increaseTypeCounter(seb)
     seb.properties(dict: _*)
     nestedBindings += seb
     seb
