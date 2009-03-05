@@ -1,4 +1,5 @@
 - overwork lifecycle code
+    - use creation callbacks
     - bad implementation currently
     - name/""/null not stable enough
     - destroy not working
