@@ -21,7 +21,13 @@ import com.google.inject.binder._
 
 
 class Config {
-  
+
+  val modules = new ListBuffer[Module]
+
+  def install(m: Module) {
+    modules += m
+  }
+
   val bindings = new ListBuffer[Binding[_ <: Object]]
   val typeCounter = new HashMap[Class[_ <: Object], Int]
 
@@ -49,6 +55,7 @@ class Config {
 
   def create(): Module = new Module() {
     def configure(binder: Binder) {
+      modules.foreach(binder.install)
       println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
       bindings.foreach(_.create(binder))
       println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
@@ -88,12 +95,6 @@ class Config {
   def lifecycle(init: String, destroy: String) {
     currentBinding.lifecycle(init, destroy)
   }
-
-  /*
-  def property(name: String): PropertyInjection = {
-    currentBinding.property(name)
-  }
-  */
 
   def ref(name: String): Symbol = {
     Symbol(name)

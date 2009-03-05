@@ -1,3 +1,17 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.bindforge.test
 
 import com.google.inject._
@@ -152,9 +166,26 @@ class SimpleModuleTest {
     val na2 = i.getInstance(Key.get(classOf[NestedAImpl2]))
     val nb = i.getInstance(Key.get(classOf[NestedB]))
 
-    assert(nb.nestedA1 == na1)
-    assert(nb.nestedA2 == na2)
-    assert(na2.value == "the_value")
+    assertTrue(nb.nestedA1 == na1)
+    assertTrue(nb.nestedA2 == na2)
+    assertTrue(na2.value == "the_value")
+  }
+
+  @Test
+  def testModuleInstall() {
+    class SimpleModule extends Config {
+      install(new MyModuleA)
+      install(new MyModuleB)
+    }
+    val i = InjectorFactory.createInjector(new SimpleModule())
+    val s1 = i.getInstance(Key.get(classOf[String], Names.named("String_1")))
+    val s2 = i.getInstance(Key.get(classOf[String], Names.named("String_2")))
+    val s3 = i.getInstance(Key.get(classOf[String], Names.named("String_3")))
+    val s4 = i.getInstance(Key.get(classOf[String], Names.named("String_4")))
+    assertTrue(s1.isInstanceOf[String])
+    assertTrue(s2.isInstanceOf[String])
+    assertTrue(s3.isInstanceOf[String])
+    assertTrue(s4.isInstanceOf[String])
   }
 
 }
