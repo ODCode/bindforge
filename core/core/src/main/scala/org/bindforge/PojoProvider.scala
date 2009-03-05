@@ -29,23 +29,12 @@ trait InjectionPoint {
   def inject[A](clazz: Class[A], obj: A, injector: Injector)
 }
 
-class PropertyInjection(name: String) extends InjectionPoint {
+object InjectWithType
+
+class PropertyInjection(name: String, value: Any) extends InjectionPoint {
 
   private val logger = LoggerFactory.getLogger(this.getClass)
   
-  var _ref: String = _
-  var _value: Any = _
-  
-  def ref(ref: String): PropertyInjection = {
-    _ref = ref
-    this
-  }
-
-  def value(value: Any): PropertyInjection = {
-    _value = value
-    this
-  }
-
   def inject[A](clazz: Class[A], obj: A, injector: Injector) {
     // First search for a "normal" setter method
     var setterName = ("set" :: name.toList.head.toUpperCase :: name.toList.tail).mkString
@@ -62,30 +51,32 @@ class PropertyInjection(name: String) extends InjectionPoint {
     logger.debug("Injecting [{}] with method [{}]", clazz.getName + "#" + name, setterName)
 
     // find the value to inject
-    var injectValue: Object = if (_value != null) {
-      _value match {
-        // if a binding was specified, register a callback to get the value
-        // of this binding's provider as soon as it is available. This is required
-        // to avoid a circular reference between this provider and the specified binding.
-        // For example, this would happen if an export handle gets injected in the
-        // binding that is going to be exported
-        case b: Binding[A] => {
-            val pi = new PropertyInjection(name)
-            b.addCreationCallback {(inj: Injector, instance: A) =>
-              pi.value(instance)
-              pi.inject(clazz, obj, injector)
-            }
-            // Skip the injection for now. Will happen in the callback.
-            return
-          }
-          // Use the specified value
-        case _ => _value.asInstanceOf[Object]
-      }
-    }
-    else {
-      val paramType = setMethod.getParameterTypes()(0)
-      val key = if (_ref == null) Key.get(paramType) else Key.get(classOf[Object], Names.named(_ref))
-      injector.getInstance(key).asInstanceOf[Object]
+    var injectValue: Object = value match {
+      // if a binding was specified, register a callback to get the value
+      // of this binding's provider as soon as it is available. This is required
+      // to avoid a circular reference between this provider and the specified binding.
+      // For example, this would happen if an export handle gets injected in the
+      // binding that is going to be exported
+      case b: Binding[_] =>
+        b.addCreationCallback {(inj: Injector, instance: Object) =>
+          val pi = new PropertyInjection(name, instance)
+          pi.inject(clazz, obj, injector)
+        }
+        // Skip the injection for now. Will happen in the callback.
+        return
+
+      // if a symbol was used, use it as the ID
+      case s: Symbol =>
+        val key = Key.get(classOf[Object], Names.named(s.name))
+        injector.getInstance(key).asInstanceOf[Object]
+
+      case InjectWithType =>
+        val paramType = setMethod.getParameterTypes()(0)
+        val key = Key.get(paramType)
+        injector.getInstance(key).asInstanceOf[Object]
+
+      // Use the specified value
+      case _ => value.asInstanceOf[Object]
     }
 
     // inject the value
@@ -114,10 +105,9 @@ class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
     return null
   }
 
-  def addProperty(name: String): PropertyInjection = {
-    val p = new PropertyInjection(name)
+  def addProperty(name: String, value: Any) {
+    val p = new PropertyInjection(name, value)
     injectionPoints += p
-    p
   }
 
   def getInstance(): A = {

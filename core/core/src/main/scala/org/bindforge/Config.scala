@@ -14,7 +14,7 @@
 
 package org.bindforge
 
-import scala.collection.mutable.{ListBuffer, HashMap}
+import scala.collection.mutable.{ListBuffer, HashMap, Stack}
 import scala.reflect.Manifest
 import com.google.inject._
 import com.google.inject.binder._
@@ -24,8 +24,12 @@ class Config {
   
   val bindings = new ListBuffer[Binding[_ <: Object]]
   val typeCounter = new HashMap[Class[_ <: Object], Int]
+
+  val specStack = new Stack[Binding[_ <: Object]]
   
-  var currentBinding: Binding[_ <: Object] = _
+  def currentBinding: Binding[_ <: Object] = {
+    specStack.top
+  }
 
   def addBinding(b: Binding[_ <: Object]) {
     bindings += b
@@ -85,8 +89,23 @@ class Config {
     currentBinding.lifecycle(init, destroy)
   }
 
+  /*
   def property(name: String): PropertyInjection = {
     currentBinding.property(name)
+  }
+  */
+
+  def ref(name: String): Symbol = {
+    Symbol(name)
+  }
+
+  object property {
+    def apply(name: String) {
+      currentBinding.property(name, InjectWithType)
+    }
+    def update(name: String, value: Any) {
+      currentBinding.property(name, value)
+    }
   }
 
   def exportService: ServiceExportBinding = {

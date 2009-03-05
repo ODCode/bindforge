@@ -47,5 +47,3 @@ class ServiceWithIntProperty {
   def getIntProperty() = intProperty
 }
 
-
-

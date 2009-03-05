@@ -40,9 +40,9 @@ extends Binding[A](config, bindType) {
   private var exportServiceDict: Map[String, Object] = null
 
   override def spec(block: => Unit) {
-    config.currentBinding = this
+    config.specStack.push(this)
     block
-    config.currentBinding = null
+    config.specStack.pop
     this
   }
 
@@ -50,8 +50,8 @@ extends Binding[A](config, bindType) {
     binding.toProvider(provider).asEagerSingleton()
   }
 
-  override def property(name: String): PropertyInjection = {
-    provider.addProperty(name)
+  override def property(name: String, value: Any) {
+    provider.addProperty(name, value)
   }
 
   override def lifecycle(init: String, destroy: String) {

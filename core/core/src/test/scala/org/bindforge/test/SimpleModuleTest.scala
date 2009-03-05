@@ -26,7 +26,7 @@ class SimpleModuleTest {
     class SimpleModule extends Config {
       bind [MyService, MyServiceImpl]
     }
-        
+     
     val i = InjectorFactory.createInjector(new SimpleModule())
     
     val ser = i.getInstance(Key.get(classOf[MyService]))
@@ -49,7 +49,7 @@ class SimpleModuleTest {
   def testInjectValue() {
     class SimpleModule extends Config {
       bind [ServiceWithIntProperty] spec {
-        property("intProperty") value 12345
+        property("intProperty") = 12345
       }
     }
     val m = new SimpleModule().create()
@@ -93,7 +93,7 @@ class SimpleModuleTest {
     class SimpleModule extends Config {
       "service1" :: bind [MyServiceImpl]
       bind [ClientWithoutAnnotation] spec {
-        property("myService") ref "service1"
+        property("myService") = ref("service1")
       }
     }
     val i = InjectorFactory.createInjector(new SimpleModule())

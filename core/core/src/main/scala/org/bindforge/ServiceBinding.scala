@@ -12,7 +12,7 @@ extends Binding[A](config, bindType) {
 
   private var _filter: String = null
 
-  override val provider: Provider[A] = null
+  private var peaberryProvider: com.google.inject.Provider[A] = _
 
   def importService {
     // dummy method to trigger implicit conversion
@@ -23,13 +23,17 @@ extends Binding[A](config, bindType) {
     this
   }
 
-  override def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
+  override def beforeBind(binder: Binder) {
     if (_filter != null) {
-      binding.toProvider(service(bindType).filter(ldap(_filter)).single())
+      peaberryProvider = service(bindType).filter(ldap(_filter)).single()
     }
     else {
-      binding.toProvider(service(bindType).single())
+      peaberryProvider = service(bindType).single()
     }
+  }
+
+  override def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
+    binding.toProvider(peaberryProvider)
   }
 
 }

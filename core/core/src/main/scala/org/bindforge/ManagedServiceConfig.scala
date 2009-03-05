@@ -51,8 +51,7 @@ class ManagedServiceImpl(pid: String) extends ManagedService {
       config.foreach {configEntry =>
         val (key, value) = configEntry
         javaConfig.put(key, value.asInstanceOf[Object])
-        val pi = new PropertyInjection(key)
-        pi.value(value)
+        val pi = new PropertyInjection(key, value)
         try {
           pi.inject(obj.getClass.asInstanceOf[Class[Any]], obj, injector)
         }
@@ -65,12 +64,12 @@ class ManagedServiceImpl(pid: String) extends ManagedService {
       val clazz = obj.getClass
       logger.debug("Calling update method [{}#{}]", clazz.getName, updateMethod)
       val method = ReflectUtils.getMethod(clazz, updateMethod)
-      type MapClass = Class[java.util.Map[String, Object]]
+      val mapClass = classOf[Map[_, _]]
       method.getParameterTypes.toList match {
-        case List(a: MapClass) => method.invoke(obj, javaConfig)
+        case mapClass :: Nil => method.invoke(obj, javaConfig)
         case Nil => method.invoke(obj, null)
         case _ => throw new Exception("Update method [" + clazz.getName + "#" + method.getName + "] does not have a supported signature. " +
-                                      "Supported are: a) No parameters and b) 1 parameter of type 'java.util.Map[String, Object]'.")
+                                      "Supported are:\na) No parameters\nb) 1 parameter of type 'java.util.Map[String, Object]'")
       }
     }
   }

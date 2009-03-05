@@ -43,7 +43,6 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
     assert(pa.isInstanceOf[PackageAdmin])
   }
 
-  /**
   def testServiceImportWithFilter() {
     val p1 = new Hashtable[String, Object]
     p1.put("testkey", "1")
@@ -75,7 +74,6 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
   def testServiceExportOnlyOne() {
     assert(context.getServiceReferences(classOf[ExportServiceWithProps].getName, null).length == 1)
   }
-
 
   def testServiceExportHandleServiceRegistration() {
     val service = new OSGiTestUtils(context).getService[ExportServiceWithPropsClient]
@@ -111,8 +109,6 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
     assert(service.lastConfig.get("username") === service.username)
     assert(service.lastConfig.get("password") === service.getPassword)
   }
-
-*/
 
 }
 
