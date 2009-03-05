@@ -53,7 +53,6 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
       key = Key.get(bindType)
       bindTarget(binder, binding)
     }
-
     nestedBindings.foreach(_.create(binder))
   }
 

@@ -14,7 +14,7 @@
 
 package org.bindforge
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, HashMap}
 import scala.reflect.Manifest
 import com.google.inject._
 import com.google.inject.binder._
@@ -22,9 +22,15 @@ import com.google.inject.binder._
 
 class Config {
   
-  val bindings = new ListBuffer[Binding[_]]
+  val bindings = new ListBuffer[Binding[_ <: Object]]
+  val typeCounter = new HashMap[Class[_ <: Object], Int]
   
   var currentBinding: Binding[_ <: Object] = _
+
+  def addBinding(b: Binding[_ <: Object]) {
+    bindings += b
+    typeCounter(b.bindType) = typeCounter.getOrElseUpdate(b.bindType, 0) + 1
+  }
 
   def create(): Module = new Module() {
     def configure(binder: Binder) {
@@ -44,14 +50,14 @@ class Config {
     else {
       newBinding = new PojoBinding[A](this, from, toType.erasure.asInstanceOf[Class[B]])
     }
-    bindings += newBinding
+    addBinding(newBinding)
     newBinding
   }
 
   implicit def binding2serviceImport[A <: Object](binding: Binding[A]): ServiceBinding[A] = {
     bindings.remove(bindings.indexOf(binding))
     val newB = new ServiceBinding(this, binding.bindType)
-    bindings += newB
+    addBinding(newB)
     newB
   }
 
