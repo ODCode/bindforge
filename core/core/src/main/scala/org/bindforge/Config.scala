@@ -126,6 +126,5 @@ class Config {
     new ManagedServiceConfig(currentBinding, pid, updateMethod)
   }
 
-
 }
 

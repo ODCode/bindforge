@@ -1,3 +1,5 @@
+- use guice injector to create instances
+
 - overwork lifecycle code
     - use creation callbacks
     - bad implementation currently

@@ -65,17 +65,17 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
         // Skip the injection for now. Will happen in the callback.
         return
 
-      // if a symbol was used, use it as the ID
+        // if a symbol was used, use it as the ID
       case s: Symbol =>
         val key = Key.get(classOf[Object], Names.named(s.name))
         injector.getInstance(key).asInstanceOf[Object]
 
-      // Lookup the value
+        // Lookup the value
       case InjectWithType =>
         val key = Key.get(paramType)
         injector.getInstance(key).asInstanceOf[Object]
 
-      // Use the specified value
+        // Use the specified value
       case _ => value.asInstanceOf[Object]
     }
 
@@ -119,10 +119,14 @@ class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
   }
 
   def create() {
-    val obj = binding.toType.newInstance
-
-    // Default Guice injection mechanism
-    injector.injectMembers(obj)
+    // Use Guice to create instance
+    val keyId = this.getClass + "_" + this.hashCode + "_localkey"
+    val subInj = injector.createChildInjector(new Module {
+        def configure(binder: Binder) {
+          binder.bind(binding.toType).annotatedWith(Names.named(keyId)).to(binding.toType.asInstanceOf[Class[_]])
+        }
+      })
+    val obj = subInj.getInstance(Key.get(binding.toType, keyId))
 
     // bindforge DI mechanism
     injectionPoints.foreach(_.inject(binding.bindType, obj, injector))
