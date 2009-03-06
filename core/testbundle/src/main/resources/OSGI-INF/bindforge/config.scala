@@ -32,3 +32,4 @@ class Config extends org.bindforge.Config {
   }
 
 }
+

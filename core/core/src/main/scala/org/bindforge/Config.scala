@@ -61,10 +61,10 @@ class Config {
       println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     }
   }
-  
-  def bind[A <: Object](implicit fromType: Manifest[A]): PojoBinding[A] = bind(fromType, null)
 
-  def bind[A <: Object, B <: A](implicit fromType: Manifest[A], toType: Manifest[B]): PojoBinding[A] = {
+  def bind[A <: Object](implicit fromType: Manifest[A]): Binding[A] = bind(fromType, null)
+
+  def bind[A <: Object, B <: A](implicit fromType: Manifest[A], toType: Manifest[B]): Binding[A] = {
     val from: Class[A] = fromType.erasure.asInstanceOf[Class[A]]
 
     var newBinding: PojoBinding[A] = null
