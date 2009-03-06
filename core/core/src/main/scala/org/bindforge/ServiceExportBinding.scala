@@ -25,8 +25,6 @@ import org.osgi.framework.ServiceRegistration
 class ServiceExportBinding(config: Config, val parentBinding: PojoBinding[_])
 extends Binding(config, classOf[ServiceRegistration]) {
 
-  override type SelfType = ServiceExportBinding
-
   override val provider = new ServiceRegistrationProvider(this)
 
   val properties = new Hashtable[String, Object]

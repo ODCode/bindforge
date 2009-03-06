@@ -23,8 +23,6 @@ import org.osgi.framework.ServiceRegistration
 
 abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
 
-  type SelfType <: Binding[A]
-
   var id: String = null
 
   var key: Key[_ <: Object] = null
@@ -36,9 +34,9 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
   /**
    * Assign an ID.
    */
-  def ::(id: String): SelfType = {
+  def ::(id: String): this.type = {
     this.id = id
-    this.asInstanceOf[SelfType]
+    this
   }
 
   def beforeBind(binder: Binder) {
