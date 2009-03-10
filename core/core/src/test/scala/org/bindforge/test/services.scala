@@ -48,11 +48,12 @@ class ServiceWithProperties {
 }
 
 
-trait NestedA
-class NestedAImpl1 extends NestedA
-class NestedAImpl2 extends NestedA {
-  var value: String = _
+trait NestedA {
+  var value: String = ""
 }
+class NestedAImpl1 extends NestedA
+class NestedAImpl2 extends NestedA
+
 class NestedB {
   var nestedA1: NestedA = _
   var nestedA2: NestedA = _

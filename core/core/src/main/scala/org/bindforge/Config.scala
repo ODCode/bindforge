@@ -18,6 +18,7 @@ import scala.collection.mutable.{ListBuffer, HashMap, Stack}
 import scala.reflect.Manifest
 import com.google.inject._
 import com.google.inject.binder._
+import com.google.inject.name.Names
 
 
 class Config {
@@ -29,7 +30,7 @@ class Config {
   }
 
   val bindings = new ListBuffer[Binding[_ <: Object]]
-  val typeCounter = new HashMap[Class[_ <: Object], Int]
+  //val typeCounter = new HashMap[Class[_ <: Object], Int]
 
   val specStack = new Stack[Binding[_ <: Object]]
   
@@ -45,20 +46,49 @@ class Config {
     bindings.remove(bindings.indexOf(b))
   }
 
-  def increaseTypeCounter(b: Binding[_ <: Object]) {
-    typeCounter(b.bindType) = typeCounter.getOrElseUpdate(b.bindType, 0) + 1
+  /*
+   def increaseTypeCounter(b: Binding[_ <: Object]) {
+   typeCounter(b.bindType) = typeCounter.getOrElseUpdate(b.bindType, 0) + 1
+   }
+
+   def decreaseTypeCounter(b: Binding[_ <: Object]) {
+   typeCounter(b.bindType) = typeCounter(b.bindType) - 1
+   }
+   */
+
+  def generateKeysForBindings() {
+    // generate (Object, ID) keys for all bindings with an ID
+    bindings.filter(_.id != null).foreach(b => b.keys += Key.get(classOf[Object], Names.named(b.id)))
+
+    // check for each binding....
+    // (only if it is not a nested binding since nested bindings should never be visible only by their type)
+    bindings.filter(!_.isNestedBinding).foreach {b =>
+      // ... if it is the only binding for this type
+      val sameTypeBindings = bindings.filter(that => that != b && that.bindType == b.bindType)
+      if (sameTypeBindings.length == 0) b.keys += Key.get(b.bindType)
+
+      // ... if it is the only binding with no ID
+      val alsoNoIdBindings = bindings.filter(that => that != b && that.bindType == b.bindType && that.id == null)
+      if (alsoNoIdBindings.length == 0 && b.id == null) b.keys += Key.get(b.bindType)
+    }
+
+    // generate an ID for bindings that still do not have a key
+    bindings.filter(_.keys.size == 0).foreach {b =>
+      val id = "binding_" + b + "_hash_" + b.hashCode
+      b.keys += Key.get(b.bindType, Names.named(id))
+    }
+
   }
 
-  def decreaseTypeCounter(b: Binding[_ <: Object]) {
-    typeCounter(b.bindType) = typeCounter(b.bindType) - 1
-  }
-
-  def create(): Module = new Module() {
-    def configure(binder: Binder) {
-      modules.foreach(binder.install)
-      println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-      bindings.foreach(_.create(binder))
-      println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+  def create(): Module = {
+    new Module() {
+      generateKeysForBindings()
+      def configure(binder: Binder) {
+        modules.foreach(binder.install)
+        println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        bindings.foreach(_.create(binder))
+        println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+      }
     }
   }
 
@@ -69,22 +99,28 @@ class Config {
 
     var newBinding: PojoBinding[A] = null
     if (toType == null) {
-      newBinding = new PojoBinding[A](this, from)
+      newBinding = new PojoBinding(this, from)
     }
     else {
       newBinding = new PojoBinding[A](this, from, toType.erasure.asInstanceOf[Class[B]])
     }
+    // if this is a nested binding, create a unique ID by pairing the parent binding and this binding
+    if (!specStack.isEmpty) {
+      newBinding.id = "nested_binding: parent_" + specStack.top.hashCode + "_nested_" + newBinding.hashCode
+      newBinding.isNestedBinding = true
+    }
+
     addBinding(newBinding)
-    increaseTypeCounter(newBinding)
+    //increaseTypeCounter(newBinding)
     newBinding
   }
 
   implicit def binding2serviceImport[A <: Object](binding: Binding[A]): ServiceBinding[A] = {
     removeBinding(binding)
-    decreaseTypeCounter(binding)
+    //decreaseTypeCounter(binding)
     val newB = new ServiceBinding(this, binding.bindType)
     addBinding(newB)
-    increaseTypeCounter(newB)
+    //increaseTypeCounter(newB)
     newB
   }
 

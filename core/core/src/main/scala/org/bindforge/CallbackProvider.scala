@@ -15,10 +15,10 @@
 package org.bindforge
 
 import scala.collection.mutable.ListBuffer
-import com.google.inject.{Inject, Injector}
+import com.google.inject.{Inject, Injector, Provider}
 
 
-abstract class Provider[A] extends com.google.inject.Provider[A] {
+abstract class CallbackProvider[A] extends Provider[A] {
 
   @Inject
   var injector: Injector = _

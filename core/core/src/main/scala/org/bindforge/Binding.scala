@@ -14,7 +14,7 @@
 
 package org.bindforge
 
-import scala.collection.mutable.{HashMap, ListBuffer}
+import scala.collection.mutable.{HashMap, LinkedHashSet}
 import com.google.inject._
 import com.google.inject.binder._
 import com.google.inject.name.Names
@@ -25,11 +25,29 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
 
   var id: String = null
 
-  var key: Key[_] = null
+  //var key: Key[_] = _
+  val keys = new LinkedHashSet[Key[_]]
 
-  val nestedBindings = new ListBuffer[Binding[_ <: Object]]
+  // Util methods to access the keys associated with this binding.
+  // We need to reverse the key set to avoid a recursive linking through all keys
+  // because the bindings will be created based on this ordering.
+  // If we do not do this, Guice will never pass us the "raw" provider.
+  // This behaviour depends heavily on Config.generateKeysForBindings() and how this
+  // methods puts the keys in the key set.
+  def mainKey = keys.toList.reverse.first
+  def restKeys = if (keys.size == 0) List[Key[_]]() else keys.toList.reverse.tail
 
-  val provider: Provider[_] = null
+  //val nestedBindings = new ListBuffer[Binding[_ <: Object]]
+
+  var isNestedBinding = false
+
+  // This value must be set to 'true' if this binding depends
+  // on the value of a parent binding. For example, the ServiceExportBinding.
+  // If this value is true, tha parent binding must not ask this binding for
+  // an instance.
+  var recursiveParentSave = true
+
+  val provider: CallbackProvider[_] = null
 
   /**
    * Assign an ID.
@@ -45,45 +63,63 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
   def create(binder: Binder) {
     beforeBind(binder)
     
-    println("... >>>>>>>>>>>>")
-    println("... for Binding: " + this.bindType + " with ID: " + this.id)
-    println("... ...")
-    // if only one binding for this type was specified, bind directly to this type
-    if (config.typeCounter(bindType) == 1) {
-      key = Key.get(bindType)
-      bindTarget(binder, binder.bind(key).asInstanceOf[LinkedBindingBuilder[Object]])
-      if (key != null) println("... Binded with key (only one binding) " + key)
-    }
-    // if an ID was specified, bind to (Object, ID)
-    if (id != null) {
-      val newKey = Key.get(classOf[Object], Names.named(id))
-      // if a binding already exists, bind to the existing key
-      if (key != null) {
-        binder.bind(newKey).to(key.asInstanceOf[Key[Object]])
-      }
-      // if this is the first binding
-      else {
-        key = newKey
-        bindTarget(binder, binder.bind(key).asInstanceOf[LinkedBindingBuilder[Object]])
-      }
-      if (key != null) println("... Binded with key (specified) " + key)
-    }
-    // if non of the above "rules" applied, bind and generate a unique ID
-    if (key == null) {
-      id = bindType.getName + "_" + this.hashCode.toString
-      key = Key.get(bindType, Names.named(id))
-      bindTarget(binder, binder.bind(key).asInstanceOf[LinkedBindingBuilder[Object]])
-      if (key != null) println("... Binded with key (generated) " + key)
-    }
-    println("... to Provider: " + provider)
-    println("... ...")
-    println("... Binding list: " + config.bindings.map(_.bindType.getName).mkString(";"))
-    println("... No of same type: " + config.typeCounter(bindType))
-    println("... <<<<<<<<<<<<")
-    
+    println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    println("Binding: " + this + ", BindType: " + bindType.getName + ", ID: " + id)
+    println("... available keys:")
+    keys.foreach(k => println("... ... " + k))
 
-    nestedBindings.foreach(_.create(binder))
+    bindTarget(binder, binder.bind(mainKey.asInstanceOf[Key[Object]]))
+    restKeys.foreach(k => binder.bind(k.asInstanceOf[Key[Object]]).to(mainKey.asInstanceOf[Key[Object]]))
+    println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+
+    //nestedBindings.foreach(_.create(binder))
   }
+
+  /*
+   def create(binder: Binder) {
+   beforeBind(binder)
+    
+   println("... >>>>>>>>>>>>")
+   println("... for Binding: " + this.bindType + " with ID: " + this.id)
+   println("... ...")
+   // if only one binding for this type was specified, bind directly to this type
+   if (config.typeCounter(bindType) == 1) {
+   key = Key.get(bindType)
+   bindTarget(binder, binder.bind(key).asInstanceOf[LinkedBindingBuilder[A]])
+   println("... Binded with key (only one binding) " + key)
+   }
+   // if an ID was specified, bind to (bindType, ID)
+   if (id != null) {
+   val newKey = Key.get(bindType, Names.named(id))
+   // if a binding already exists, bind to the existing key
+   if (key != null) {
+   binder.bind(newKey).to(key.asInstanceOf[Key[A]])
+   println("... Binded with key (specified) " + newKey + " to existing key " + key)
+   }
+   // if this is the first binding
+   else {
+   key = newKey
+   bindTarget(binder, binder.bind(key).asInstanceOf[LinkedBindingBuilder[A]])
+   println("... Binded with key (specified) " + key + " to a new provider")
+   }
+   }
+   // if non of the above "rules" apply, bind and generate a unique ID
+   // (that is, more than one binding for this type and no specified ID)
+   if (key == null) {
+   id = bindType.getName + "_" + this.hashCode.toString
+   key = Key.get(bindType, Names.named(id))
+   bindTarget(binder, binder.bind(key).asInstanceOf[LinkedBindingBuilder[A]])
+   println("... Binded with key (generated) " + key)
+   }
+   println("... Provider: " + provider)
+   println("... ...")
+   println("... Binding list: " + config.bindings.map(_.bindType.getName).mkString(";"))
+   println("... No of same type: " + config.typeCounter(bindType))
+   println("... <<<<<<<<<<<<")
+
+   nestedBindings.foreach(_.create(binder))
+   }
+   */
 
   def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
   }

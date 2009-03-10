@@ -18,7 +18,6 @@ import scala.collection.mutable.ListBuffer
 import java.lang.reflect.Method
 import org.slf4j.LoggerFactory
 import com.google.inject._
-import com.google.inject.{Provider => GuiceProvider}
 import com.google.inject.name._
 
 
@@ -64,13 +63,18 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
           val pi = new PropertyInjection(name, instance)
           pi.inject(clazz, obj, injector)
         }
+        // If the nested binding does not depend on the value of this binding,
+        // ask for an instance to trigger the injection
+        if (b.recursiveParentSave) {
+          injector.getInstance(b.mainKey)
+        }
         // Skip the injection for now. Will happen in the callback.
         return
 
         // if a symbol was used, use it as the ID
       case s: Symbol =>
         val key = Key.get(classOf[Object], Names.named(s.name))
-        injector.getInstance(key).asInstanceOf[Object]
+        injector.getInstance(key)
 
         // Lookup the value
       case InjectWithType =>
@@ -86,7 +90,7 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
   }
 }
 
-class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
+class PojoProvider[A <: Object](binding: PojoBinding[A]) extends CallbackProvider[A] {
   
   private val injectionPoints = new ListBuffer[InjectionPoint]
 
@@ -94,7 +98,7 @@ class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
   private var destroyMethod: Method = _
   private var instance: A = _
 
-  var rawProvider: GuiceProvider[A] = _
+  var rawProvider: Provider[A] = _
 
   def setInitAndDestroy(init: String, destroy: String) {
     initMethod = getMethod(init, "init")

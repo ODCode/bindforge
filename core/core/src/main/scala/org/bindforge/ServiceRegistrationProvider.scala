@@ -18,21 +18,24 @@ import org.osgi.framework.{BundleContext, ServiceRegistration}
 import com.google.inject.{Inject, Injector, Key}
 
 
-class ServiceRegistrationProvider(exportBinding: ServiceExportBinding) extends Provider[ServiceRegistration] {
+class ServiceRegistrationProvider(exportBinding: ServiceExportBinding) extends CallbackProvider[ServiceRegistration] {
 
   @Inject
   var context: BundleContext = _
 
   private var serviceRegistration: ServiceRegistration = _
 
-  private def registerService() {
-    val obj = injector.getInstance(exportBinding.parentBinding.key)
-    val props = exportBinding.properties
-    serviceRegistration = context.registerService(exportBinding.parentBinding.bindType.getName, obj, props)
+  println(this + ": registering callback in target binding: " + exportBinding.parentBinding)
+  exportBinding.parentBinding.addCreationCallback {case (injector, instance) =>
+      println(this + ": got a value from target binding: " + instance)
+      val props = exportBinding.properties
+      serviceRegistration = context.registerService(exportBinding.parentBinding.bindType.getName, instance, props)
   }
 
   def getInstance(): ServiceRegistration = {
-    if (serviceRegistration == null) registerService()
+    if (serviceRegistration == null) {
+      injector.getInstance(exportBinding.parentBinding.mainKey)
+    }
     serviceRegistration
   }
 

@@ -14,15 +14,15 @@
 
 package org.bindforge
 
-import com.google.inject.{Key, Provider=>GuiceProvider, Scope, Scopes}
+import com.google.inject.{Key, Provider, Scope, Scopes}
 
 
 class ProviderChainScope[A <: Object](insertProvider: PojoProvider[A]) extends Scope {
 
-  override def scope[T](key: Key[T], unscoped: GuiceProvider[T]): GuiceProvider[T] = {
+  override def scope[T](key: Key[T], unscoped: Provider[T]): Provider[T] = {
     println("OOOOOOOOOOO scoping " + unscoped + " and key " + key + " with " + insertProvider)
-    insertProvider.rawProvider = unscoped.asInstanceOf[GuiceProvider[A]]
-    val newProvider = insertProvider.asInstanceOf[GuiceProvider[T]]
+    insertProvider.rawProvider = unscoped.asInstanceOf[Provider[A]]
+    val newProvider = insertProvider.asInstanceOf[Provider[T]]
 
     Scopes.SINGLETON.scope(key, newProvider)
   }

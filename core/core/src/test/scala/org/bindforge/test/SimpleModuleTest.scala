@@ -23,7 +23,6 @@ import org.osgi.service.packageadmin.PackageAdmin
 
 class SimpleModuleTest {
 
-  /*
   @Test
   def testSimpleBind() {
     class SimpleModule extends Config {
@@ -50,6 +49,7 @@ class SimpleModuleTest {
   @Test
   def testId() {
     class SimpleModule extends Config {
+      bind [MyServiceImpl]
       "s1" :: bind [MyServiceImpl]
     }
     val i = InjectorFactory.createInjector(new SimpleModule)
@@ -117,7 +117,7 @@ class SimpleModuleTest {
     assertTrue(client.getMyService.isInstanceOf[MyServiceImpl])
   }
 
-  @Test
+ @Test
   def testInitCallback() {
     class SimpleModule extends Config {
       bind [MyServiceImpl] spec {
@@ -145,7 +145,6 @@ class SimpleModuleTest {
       case e: Exception =>
     }
   }
-  */
 
   @Test
   def testNestedBindings() {
@@ -153,24 +152,20 @@ class SimpleModuleTest {
       bind [NestedA, NestedAImpl1]
       bind [NestedB] spec {
         property("nestedA1")
-        property("nestedA2") = bind [NestedAImpl2]
-        //= bind [NestedAImpl2] spec {
-        //  property("value") = "the_value"
-        //}
+        property("nestedA2") = bind [NestedAImpl2] spec {
+          property("value") = "the_value"
+        }
       }
     }
     val i = InjectorFactory.createInjector(new SimpleModule())
-    val na1 = i.getInstance(Key.get(classOf[NestedA]))
-    //val na2 = i.getInstance(Key.get(classOf[NestedAImpl2]))
     val nb = i.getInstance(Key.get(classOf[NestedB]))
+    val na1 = i.getInstance(Key.get(classOf[NestedA]))
 
     assertTrue(nb.nestedA1 == na1)
-    //assertTrue(nb.nestedA2 == na2)
     assertTrue(nb.nestedA2 != null)
-    //assertTrue(na2.value == "the_value")
+    assertTrue(nb.nestedA2.value == "the_value")
   }
 
-  /*
   @Test
   def testModuleInstall() {
     class SimpleModule extends Config {
@@ -183,6 +178,5 @@ class SimpleModuleTest {
     assertTrue(s1.isInstanceOf[String])
     assertTrue(s2.isInstanceOf[String])
   }
-  */
 
 }

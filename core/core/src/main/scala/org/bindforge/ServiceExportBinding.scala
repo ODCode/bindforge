@@ -17,6 +17,7 @@ package org.bindforge
 import java.util.Hashtable
 import com.google.inject.Binder
 import com.google.inject.Key
+import com.google.inject.Provider
 import com.google.inject.binder.LinkedBindingBuilder
 import com.google.inject.name.Names
 import org.osgi.framework.ServiceRegistration
@@ -26,6 +27,13 @@ class ServiceExportBinding(config: Config, val parentBinding: PojoBinding[_])
 extends Binding(config, classOf[ServiceRegistration]) {
 
   override val provider = new ServiceRegistrationProvider(this)
+  
+  isNestedBinding = true
+
+  recursiveParentSave = false
+
+  // Start with a unique ID
+  this.id = getClass.getName + hashCode + "_forBinding_" + parentBinding.hashCode
 
   val properties = new Hashtable[String, Object]
 

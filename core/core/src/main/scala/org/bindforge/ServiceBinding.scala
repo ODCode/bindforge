@@ -1,7 +1,7 @@
 
 package org.bindforge
 
-import com.google.inject.Binder
+import com.google.inject.{Binder, Provider}
 import com.google.inject.binder.LinkedBindingBuilder
 import org.ops4j.peaberry.Peaberry._
 import org.ops4j.peaberry.util.Filters.ldap
@@ -12,7 +12,7 @@ extends Binding[A](config, bindType) {
 
   private var _filter: String = null
 
-  private var peaberryProvider: com.google.inject.Provider[A] = _
+  private var peaberryProvider: Provider[A] = _
 
   def importService {
     // dummy method to trigger implicit conversion
@@ -24,6 +24,7 @@ extends Binding[A](config, bindType) {
   }
 
   override def beforeBind(binder: Binder) {
+    // TODO: Check if I can move this code to bindTarget
     if (_filter != null) {
       peaberryProvider = service(bindType).filter(ldap(_filter)).single()
     }

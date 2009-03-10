@@ -52,8 +52,8 @@ extends Binding[A](config, bindType) {
     binder.requestInjection(provider)
 
     // bind to a target if necessary
-    val targeted = if (bindType != toType) {
-      binding.to(toType)
+    val targeted = if (bindType != toType || mainKey.getAnnotation != null) {
+    binding.to(toType.asInstanceOf[Class[Object]])
     }
     else {
       binding
@@ -72,9 +72,10 @@ extends Binding[A](config, bindType) {
   
   override def exportService(dict: Tuple2[String, Object]*): ServiceExportBinding = {
     val seb = new ServiceExportBinding(config, this)
-    config.increaseTypeCounter(seb)
+    //config.increaseTypeCounter(seb)
     seb.properties(dict: _*)
-    nestedBindings += seb
+    //nestedBindings += seb
+    config.addBinding(seb)
     seb
   }
   
