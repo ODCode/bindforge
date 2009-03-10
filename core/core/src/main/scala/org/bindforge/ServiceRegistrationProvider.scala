@@ -25,9 +25,7 @@ class ServiceRegistrationProvider(exportBinding: ServiceExportBinding) extends C
 
   private var serviceRegistration: ServiceRegistration = _
 
-  println(this + ": registering callback in target binding: " + exportBinding.parentBinding)
   exportBinding.parentBinding.addCreationCallback {case (injector, instance) =>
-      println(this + ": got a value from target binding: " + instance)
       val props = exportBinding.properties
       serviceRegistration = context.registerService(exportBinding.parentBinding.bindType.getName, instance, props)
   }

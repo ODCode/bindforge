@@ -20,7 +20,6 @@ import com.google.inject.{Key, Provider, Scope, Scopes}
 class ProviderChainScope[A <: Object](insertProvider: PojoProvider[A]) extends Scope {
 
   override def scope[T](key: Key[T], unscoped: Provider[T]): Provider[T] = {
-    println("OOOOOOOOOOO scoping " + unscoped + " and key " + key + " with " + insertProvider)
     insertProvider.rawProvider = unscoped.asInstanceOf[Provider[A]]
     val newProvider = insertProvider.asInstanceOf[Provider[T]]
 

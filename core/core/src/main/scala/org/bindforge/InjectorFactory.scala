@@ -18,12 +18,7 @@ object InjectorFactory {
       }
     }
     val inj = Guice.createInjector(module)
-    println("///////////////////////////////////////////////////////////")
-    println("Injector:")
-    println(inj)
-    println("Activating all bindings:")
     config.bindings.foreach(b => inj.getInstance(b.mainKey))
-    println("Done")
     inj
   }
     

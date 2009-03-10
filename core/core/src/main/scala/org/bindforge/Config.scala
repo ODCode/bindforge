@@ -46,16 +46,6 @@ class Config {
     bindings.remove(bindings.indexOf(b))
   }
 
-  /*
-   def increaseTypeCounter(b: Binding[_ <: Object]) {
-   typeCounter(b.bindType) = typeCounter.getOrElseUpdate(b.bindType, 0) + 1
-   }
-
-   def decreaseTypeCounter(b: Binding[_ <: Object]) {
-   typeCounter(b.bindType) = typeCounter(b.bindType) - 1
-   }
-   */
-
   def generateKeysForBindings() {
     // generate (Object, ID) keys for all bindings with an ID
     bindings.filter(_.id != null).foreach(b => b.keys += Key.get(classOf[Object], Names.named(b.id)))
@@ -85,9 +75,7 @@ class Config {
       generateKeysForBindings()
       def configure(binder: Binder) {
         modules.foreach(binder.install)
-        println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         bindings.foreach(_.create(binder))
-        println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
       }
     }
   }
