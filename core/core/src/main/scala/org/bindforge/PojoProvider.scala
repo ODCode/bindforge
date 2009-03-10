@@ -18,6 +18,7 @@ import scala.collection.mutable.ListBuffer
 import java.lang.reflect.Method
 import org.slf4j.LoggerFactory
 import com.google.inject._
+import com.google.inject.{Provider => GuiceProvider}
 import com.google.inject.name._
 
 
@@ -58,6 +59,7 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
       // For example, this would happen if an export handle gets injected in the
       // binding that is going to be exported
       case b: Binding[_] =>
+        logger.debug("Registering callback at binding [{}] for property [{}]", b, name)
         b.addCreationCallback {(inj: Injector, instance: Object) =>
           val pi = new PropertyInjection(name, instance)
           pi.inject(clazz, obj, injector)
@@ -72,8 +74,7 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
 
         // Lookup the value
       case InjectWithType =>
-        val key = Key.get(paramType)
-        injector.getInstance(key).asInstanceOf[Object]
+        injector.getInstance(paramType)
 
         // Use the specified value
       case _ => value.asInstanceOf[Object]
@@ -92,6 +93,8 @@ class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
   private var initMethod: Method = _
   private var destroyMethod: Method = _
   private var instance: A = _
+
+  var rawProvider: GuiceProvider[A] = _
 
   def setInitAndDestroy(init: String, destroy: String) {
     initMethod = getMethod(init, "init")
@@ -120,13 +123,7 @@ class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
 
   def create() {
     // Use Guice to create instance
-    val keyId = this.getClass + "_" + this.hashCode + "_localkey"
-    val subInj = injector.createChildInjector(new Module {
-        def configure(binder: Binder) {
-          binder.bind(binding.toType).annotatedWith(Names.named(keyId)).to(binding.toType.asInstanceOf[Class[_]])
-        }
-      })
-    val obj = subInj.getInstance(Key.get(binding.toType, keyId))
+    val obj = rawProvider.get()
 
     // bindforge DI mechanism
     injectionPoints.foreach(_.inject(binding.bindType, obj, injector))
@@ -135,7 +132,6 @@ class PojoProvider[A <: Object](binding: PojoBinding[A]) extends Provider[A] {
     if (initMethod != null) {
       executeInitMethod(obj)
     }
-
     instance = obj
   }
 

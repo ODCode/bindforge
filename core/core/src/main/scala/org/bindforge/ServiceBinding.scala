@@ -32,7 +32,7 @@ extends Binding[A](config, bindType) {
     }
   }
 
-  override def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
+  override def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
     binding.toProvider(peaberryProvider)
   }
 

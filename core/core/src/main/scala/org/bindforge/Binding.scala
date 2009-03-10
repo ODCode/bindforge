@@ -25,7 +25,7 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
 
   var id: String = null
 
-  var key: Key[_ <: Object] = null
+  var key: Key[_] = null
 
   val nestedBindings = new ListBuffer[Binding[_ <: Object]]
 
@@ -45,33 +45,35 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
   def create(binder: Binder) {
     beforeBind(binder)
     
-    // if an ID was specified, bind to (Object, ID)
     println("... >>>>>>>>>>>>")
     println("... for Binding: " + this.bindType + " with ID: " + this.id)
     println("... ...")
-    if (id != null) {
-      val binding = binder.bind(classOf[Object]).annotatedWith(Names.named(id))
-      bindTarget(binder, binding)
-      key = Key.get(classOf[Object], Names.named(id))
-
-      if (key != null) println("... Binded with key " + key)
-    }
     // if only one binding for this type was specified, bind directly to this type
     if (config.typeCounter(bindType) == 1) {
-      val binding = binder.bind(bindType)
-      bindTarget(binder, binding)
       key = Key.get(bindType)
-
-      if (key != null) println("... Binded with key " + key)
+      bindTarget(binder, binder.bind(key).asInstanceOf[LinkedBindingBuilder[Object]])
+      if (key != null) println("... Binded with key (only one binding) " + key)
+    }
+    // if an ID was specified, bind to (Object, ID)
+    if (id != null) {
+      val newKey = Key.get(classOf[Object], Names.named(id))
+      // if a binding already exists, bind to the existing key
+      if (key != null) {
+        binder.bind(newKey).to(key.asInstanceOf[Key[Object]])
+      }
+      // if this is the first binding
+      else {
+        key = newKey
+        bindTarget(binder, binder.bind(key).asInstanceOf[LinkedBindingBuilder[Object]])
+      }
+      if (key != null) println("... Binded with key (specified) " + key)
     }
     // if non of the above "rules" applied, bind and generate a unique ID
     if (key == null) {
       id = bindType.getName + "_" + this.hashCode.toString
-      val binding = binder.bind(classOf[Object]).annotatedWith(Names.named(id))
-      bindTarget(binder, binding)
       key = Key.get(bindType, Names.named(id))
-
-      if (key != null) println("... Binded with key " + key)
+      bindTarget(binder, binder.bind(key).asInstanceOf[LinkedBindingBuilder[Object]])
+      if (key != null) println("... Binded with key (generated) " + key)
     }
     println("... to Provider: " + provider)
     println("... ...")
@@ -83,10 +85,12 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
     nestedBindings.foreach(_.create(binder))
   }
 
-  def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
+  def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
   }
 
   def addCreationCallback(callback: (Injector, A) => Unit) {
+    println("Binding: " + this + ": Adding callback")
+
     // ugly warp to get from "Any" to "A"
     provider.addCreationCallback((injector, obj) => callback(injector, obj.asInstanceOf[A]))
   }

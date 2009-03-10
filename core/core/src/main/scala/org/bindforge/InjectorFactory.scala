@@ -7,8 +7,7 @@ import com.google.inject.{Guice, Injector, Module, Binder}
 object InjectorFactory {
 
   def createInjector(config: Config): Injector = {
-    val module = config.create()
-    Guice.createInjector(module)
+    createInjector(config, Array[Module](): _*)
   }
 
   def createInjector(config: Config, modules: Module*): Injector = {
@@ -18,7 +17,11 @@ object InjectorFactory {
         modules.foreach(binder.install(_))
       }
     }
-    Guice.createInjector(module)
+    val inj = Guice.createInjector(module)
+    println("///////////////////////////////////////////////////////////")
+    println("Injector:")
+    println(inj)
+    inj
   }
     
 }

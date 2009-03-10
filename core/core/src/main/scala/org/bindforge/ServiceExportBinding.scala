@@ -29,31 +29,9 @@ extends Binding(config, classOf[ServiceRegistration]) {
 
   val properties = new Hashtable[String, Object]
 
-  /*
-  override def create(binder: Binder) {
-    // We have to create a name for this binding. Otherwise we would only bind to
-    // the class ServiceRegistration and Guice' configuration would fail as soon as
-    // a 2nd registration would get binded. Therefore, we either use the ID supplied
-    // by the user or we use a unique combination of various properties
-    var name = id
-    if (name == null) {
-      name = parentBinding.bindType.getName + parentBinding.toType.getName + parentBinding.id + this.hashCode
-    }
-    provider.key = parentBinding.key
-    binder.bind(classOf[Object]).annotatedWith(Names.named(name)).toProvider(provider).asEagerSingleton()
-
-    // Since we override create() we have to assign the key ourself
-    key = Key.get(classOf[Object], Names.named(name))
+  override def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
+    binding.toProvider(provider).asEagerSingleton()
   }
-  */
-
-  override def bindTarget[ServiceRegistration](binder: Binder, binding: LinkedBindingBuilder[ServiceRegistration]) {
-    // I have no idea why I have to cast the provider to Provider[ServiceRegistration]
-    // since the ServiceRegistrationProvider already extends Provider[ServiceRegistration]
-    // However, it is working...
-    binding.toProvider(provider.asInstanceOf[Provider[ServiceRegistration]]).asEagerSingleton()
-  }
-
 
   def properties(dict: Tuple2[String, Object]*) {
     dict.foreach(e => properties.put(e._1, e._2))

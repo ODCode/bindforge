@@ -53,7 +53,6 @@ class NestedAImpl1 extends NestedA
 class NestedAImpl2 extends NestedA {
   var value: String = _
 }
-
 class NestedB {
   var nestedA1: NestedA = _
   var nestedA2: NestedA = _

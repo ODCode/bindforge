@@ -26,12 +26,15 @@ abstract class Provider[A] extends com.google.inject.Provider[A] {
   val callbacks = new ListBuffer[(Injector, A) => Unit]
 
   def addCreationCallback(callback: (Injector, A) => Unit) {
+    println("Provider: " + this + ": Addind callback")
     callbacks += callback
   }
 
   final def get(): A = {
+    println("Provider: " + this + ": creating instance")
     val instance = getInstance()
     callbacks.foreach(_(injector, instance))
+    println("Provider: " + this + ": instance created: " + instance)
     instance
   }
 

@@ -34,7 +34,7 @@ extends Binding[A](config, bindType) {
   def this(config: Config, bindType: Class[A]) = {
     this(config, bindType, bindType)
   }
-  
+
   override val provider = new PojoProvider(this)
 
   private var exportServiceDict: Map[String, Object] = null
@@ -46,8 +46,20 @@ extends Binding[A](config, bindType) {
     this
   }
 
-  override def bindTarget[T >: A](binder: Binder, binding: LinkedBindingBuilder[T]) {
-    binding.toProvider(provider).asEagerSingleton()
+  override def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
+    // The PojoProvider is not binded itself. Therefore, we have to request the
+    // injection so that the provider has access to e.g. the injector
+    binder.requestInjection(provider)
+
+    // bind to a target if necessary
+    val targeted = if (bindType != toType) {
+      binding.to(toType)
+    }
+    else {
+      binding
+    }
+    // bind in the scope
+    targeted.in(new ProviderChainScope(provider))
   }
 
   override def property(name: String, value: Any) {
