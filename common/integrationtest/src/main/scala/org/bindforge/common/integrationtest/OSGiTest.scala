@@ -33,7 +33,7 @@ class OSGiTest extends Suite {
 
   private val bundles = new ListBuffer[String]
 
-  addBundle("org.bindforge", "bindforge.scala-library", "2.7.3")
+  addBundle("org.bindforge", "scala-full-bundle", "2.7.3")
   addBundle("org.bindforge", "bindforge.common.integrationtest", "1.0.0")
   addBundle("org.ops4j.pax.logging", "pax-logging-api", "1.3.0")
   addBundle("org.ops4j.pax.logging", "pax-logging-service", "1.3.0")
