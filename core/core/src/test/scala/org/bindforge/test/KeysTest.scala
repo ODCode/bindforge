@@ -129,4 +129,18 @@ class KeysTest {
     assertTrue(bs.get(0) != bImpl.get(0))
   }
 
+  @Test
+  def testTwoServiceBindingNoIds() {
+    class SimpleModule extends Config {
+      bind [MyService, MyServiceImpl]
+      bind [MyService, MyServiceImpl]
+    }
+    val i = InjectorFactory.createInjector(new SimpleModule())
+    val bs = i.findBindingsByType(TypeLiteral.get(classOf[MyService]))
+    assertTrue(bs.size == 2)
+    assertTrue(bs.get(0).getKey.getAnnotation != null)
+    assertTrue(bs.get(1).getKey.getAnnotation != null)
+    assertTrue(bs.get(0) != bs.get(1))
+  }
+
 }
