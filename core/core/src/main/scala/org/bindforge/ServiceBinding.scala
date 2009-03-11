@@ -23,17 +23,13 @@ extends Binding[A](config, bindType) {
     this
   }
 
-  override def beforeBind(binder: Binder) {
-    // TODO: Check if I can move this code to bindTarget
+  override def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
     if (_filter != null) {
       peaberryProvider = service(bindType).filter(ldap(_filter)).single()
     }
     else {
       peaberryProvider = service(bindType).single()
     }
-  }
-
-  override def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
     binding.toProvider(peaberryProvider)
   }
 
