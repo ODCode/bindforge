@@ -16,7 +16,7 @@
 
 package org.bindforge.internal
 
-import scala.collection.mutable.HashSet
+import scala.collection.mutable.{HashSet, ListBuffer}
 
 import org.osgi.framework._
 import org.slf4j.Logger
@@ -36,6 +36,8 @@ class BundleTracker(context: BundleContext, bindforgeService: BindforgeService) 
   val BINDFORGE_HEADER = "Bindforge-Config"
   
   val trackedBundles = new HashSet[Bundle]()
+
+  val activeConfigs = new ListBuffer[Config]
   
   def start() {
     if (active) {
@@ -102,6 +104,8 @@ class BundleTracker(context: BundleContext, bindforgeService: BindforgeService) 
       val bindingConfig = configClass.newInstance
       val osgiModule = Peaberry.osgiModule(bundle.getBundleContext)
       InjectorFactory.createInjector(bindingConfig, osgiModule)
+      
+      activeConfigs += bindingConfig
     }
     finally {
       bindforgeService.addTrackedBundle(bundle.getBundleId)
@@ -111,6 +115,7 @@ class BundleTracker(context: BundleContext, bindforgeService: BindforgeService) 
   def stopTrackingBundle(bundle: Bundle) {
     logger.info("Closing binding configuration for bundle [{}]", bundle.getSymbolicName)
     bindforgeService.removeTrackedBundle(bundle.getBundleId)
+    activeConfigs.foreach(_.shutdown())
   }
 
   private def getConfigHeader(bundle: Bundle): String = {

@@ -87,6 +87,10 @@ class Config {
     }
   }
 
+  def shutdown() {
+    bindings.foreach(_.shutdown())
+  }
+
   def bind[A <: Object](implicit fromType: Manifest[A]): Binding[A] = bind(fromType, null)
 
   def bind[A <: Object, B <: A](implicit fromType: Manifest[A], toType: Manifest[B]): Binding[A] = {

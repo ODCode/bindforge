@@ -56,6 +56,10 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
     restKeys.foreach(k => binder.bind(k.asInstanceOf[Key[Object]]).to(mainKey.asInstanceOf[Key[Object]]))
   }
 
+  def shutdown() {
+    
+  }
+
   def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
   }
 
