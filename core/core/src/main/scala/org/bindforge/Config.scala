@@ -46,10 +46,14 @@ class Config {
     bindings.remove(bindings.indexOf(b))
   }
 
+  /**
+   * Generate unique keys for all bindings.
+   *
+   * Implementation detail: The order the generated keys are very important.
+   * If done wrong, the keys could point to itself with an endless loop. Modifications
+   * to this method should therefore be done very carefully.
+   */
   def generateKeysForBindings() {
-    // generate (Object, ID) keys for all bindings with an ID
-    bindings.filter(_.id != null).foreach(b => b.keys += Key.get(classOf[Object], Names.named(b.id)))
-
     // check for each binding....
     // (only if it is not a nested binding since nested bindings should never be visible only by their type)
     bindings.filter(!_.isNestedBinding).foreach {b =>
@@ -61,6 +65,9 @@ class Config {
       val alsoNoIdBindings = bindings.filter(that => that != b && that.bindType == b.bindType && that.id == null)
       if (alsoNoIdBindings.length == 0 && b.id == null) b.keys += Key.get(b.bindType)
     }
+
+    // generate (Object, ID) keys for all bindings with an ID
+    bindings.filter(_.id != null).foreach(b => b.keys += Key.get(classOf[Object], Names.named(b.id)))
 
     // generate an ID for bindings that still do not have a key
     bindings.filter(_.keys.size == 0).foreach {b =>

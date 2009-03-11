@@ -26,15 +26,8 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
   var id: String = null
 
   val keys = new LinkedHashSet[Key[_]]
-
-  // Util methods to access the keys associated with this binding.
-  // We need to reverse the key set to avoid a recursive linking through all keys
-  // because the bindings will be created based on this ordering.
-  // If we do not do this, Guice will never pass us the "raw" provider.
-  // This behaviour depends heavily on Config.generateKeysForBindings() and how this
-  // methods puts the keys in the key set.
-  def mainKey = keys.toList.reverse.first
-  def restKeys = if (keys.size == 0) List[Key[_]]() else keys.toList.reverse.tail
+  def mainKey = keys.toList.first
+  def restKeys = if (keys.size == 0) List[Key[_]]() else keys.toList.tail
 
   var isNestedBinding = false
 
@@ -61,7 +54,6 @@ abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
     beforeBind(binder)
     bindTarget(binder, binder.bind(mainKey.asInstanceOf[Key[Object]]))
     restKeys.foreach(k => binder.bind(k.asInstanceOf[Key[Object]]).to(mainKey.asInstanceOf[Key[Object]]))
-    //nestedBindings.foreach(_.create(binder))
   }
 
   def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
