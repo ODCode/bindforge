@@ -24,7 +24,7 @@
 		    <version>1.0.0</version>
 	    </dependency>
 	    <dependency>
-		    <groupId>org.bindforge</groupId>
+		    <groupId>org.scala-lang</groupId>
 		    <artifactId>scala-full-bundle</artifactId>
 		    <version>2.7.3</version>
 	    </dependency>
