@@ -26,6 +26,8 @@ import org.osgi.framework.ServiceRegistration
 class ServiceExportBinding(config: Config, val parentBinding: PojoBinding[_])
 extends Binding(config, classOf[ServiceRegistration]) {
 
+  private val properties = new Hashtable[String, Object]
+
   override val provider = new ServiceRegistrationProvider(this)
   
   isNestedBinding = true
@@ -35,14 +37,20 @@ extends Binding(config, classOf[ServiceRegistration]) {
   // Start with a unique ID
   this.id = getClass.getName + hashCode + "_forBinding_" + parentBinding.hashCode
 
-  val properties = new Hashtable[String, Object]
-
   override def bindTarget(binder: Binder, binding: LinkedBindingBuilder[Object]) {
     binding.toProvider(provider).asEagerSingleton()
   }
 
   def properties(dict: Tuple2[String, Object]*) {
     dict.foreach(e => properties.put(e._1, e._2))
+  }
+
+  def getProperties() = {
+    properties
+  }
+
+  override def shutdown() {
+    provider.shutdown()
   }
 
 }

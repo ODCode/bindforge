@@ -26,7 +26,7 @@ class ServiceRegistrationProvider(exportBinding: ServiceExportBinding) extends C
   private var serviceRegistration: ServiceRegistration = _
 
   exportBinding.parentBinding.addCreationCallback {case (injector, instance) =>
-      val props = exportBinding.properties
+      val props = exportBinding.getProperties
       serviceRegistration = context.registerService(exportBinding.parentBinding.bindType.getName, instance, props)
   }
 
@@ -35,6 +35,15 @@ class ServiceRegistrationProvider(exportBinding: ServiceExportBinding) extends C
       injector.getInstance(exportBinding.parentBinding.mainKey)
     }
     serviceRegistration
+  }
+
+  def shutdown() {
+    try {
+      serviceRegistration.unregister()
+    }
+    catch {
+      case e: java.lang.IllegalStateException => // Service might already be unregistered. Ignore.
+    }
   }
 
 }

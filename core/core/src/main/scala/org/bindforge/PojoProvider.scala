@@ -93,7 +93,6 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
 class PojoProvider[A <: Object](binding: PojoBinding[A]) extends CallbackProvider[A] {
   
   private val injectionPoints = new ListBuffer[InjectionPoint]
-
   private var initMethod: Method = _
   private var destroyMethod: Method = _
   private var instance: A = _

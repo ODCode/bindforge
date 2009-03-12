@@ -18,7 +18,10 @@ object InjectorFactory {
       }
     }
     val inj = Guice.createInjector(module)
-    config.bindings.foreach(b => inj.getInstance(b.mainKey))
+
+    // Eagerly load
+    config.getBindings.foreach(b => inj.getInstance(b.mainKey))
+    
     inj
   }
     

@@ -16,7 +16,7 @@ package org.bindforge
 
 import scala.collection.mutable
 import com.google.inject.Injector
-import org.osgi.framework.BundleContext
+import org.osgi.framework.{BundleContext, ServiceRegistration}
 import org.osgi.service.cm.ManagedService
 import org.slf4j.LoggerFactory
 
@@ -86,13 +86,16 @@ object ManagedServiceStore {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   val managedServices = mutable.HashMap.empty[String, ManagedServiceImpl]
+  val registrations = new mutable.ListBuffer[ServiceRegistration]
 
   def getManagedService(pid: String, context: BundleContext): ManagedServiceImpl = {
     managedServices.getOrElseUpdate(pid, {
         logger.debug("Creating ManagedService for PID [{}]", pid)
         val ms = new ManagedServiceImpl(pid)
         val map = Map("service.pid" -> pid)
-        context.registerService(classOf[ManagedService].getName, ms, map)
+        val registration = context.registerService(classOf[ManagedService].getName, ms, map)
+        registrations += registration
+
         ms
       })
   }
@@ -103,11 +106,28 @@ object ManagedServiceStore {
     logger.debug("Adding object [{}] as configuration target for PID [{}]", target, pid)
     ms.addConfigurationTarget(target, updateMethod, injector)
   }
+
+  def shutdown() {
+    registrations.foreach {r =>
+      try {
+        r.unregister()
+      }
+      catch {
+        case e: java.lang.IllegalStateException => // Service might already be unregistered. Ignore.
+      }
+    }
+    registrations.clear()
+    managedServices.clear()
+  }
   
 }
 
 
 class ManagedServiceConfig[A <: Object](binding: Binding[A], pid: String, updateMethod: String) {
+
+  binding.config.addShutdownLister {
+    ManagedServiceStore.shutdown()
+  }
 
   binding.addCreationCallback {(injector, instance) =>
     ManagedServiceStore.addConfigurationTarget(pid, instance, updateMethod, injector)

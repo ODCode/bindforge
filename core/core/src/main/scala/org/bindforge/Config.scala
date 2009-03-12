@@ -23,19 +23,28 @@ import com.google.inject.name.Names
 
 class Config {
 
-  val modules = new ListBuffer[Module]
+  private val modules = new ListBuffer[Module]
+
+  private val shutdownListeners = new ListBuffer[() => Unit]
+
+  private val bindings = new ListBuffer[Binding[_ <: Object]]
+
+  val specStack = new Stack[Binding[_ <: Object]]
 
   def install(m: Module) {
     modules += m
   }
 
-  val bindings = new ListBuffer[Binding[_ <: Object]]
-  //val typeCounter = new HashMap[Class[_ <: Object], Int]
-
-  val specStack = new Stack[Binding[_ <: Object]]
+  def addShutdownLister(hook: => Unit) {
+    shutdownListeners += hook _
+  }
   
   def currentBinding: Binding[_ <: Object] = {
     specStack.top
+  }
+
+  def getBindings() = {
+    bindings.readOnly
   }
 
   def addBinding(b: Binding[_ <: Object]) {
@@ -88,6 +97,7 @@ class Config {
   }
 
   def shutdown() {
+    shutdownListeners.foreach(_())
     bindings.foreach(_.shutdown())
   }
 
@@ -110,16 +120,13 @@ class Config {
     }
 
     addBinding(newBinding)
-    //increaseTypeCounter(newBinding)
     newBinding
   }
 
   implicit def binding2serviceImport[A <: Object](binding: Binding[A]): ServiceBinding[A] = {
     removeBinding(binding)
-    //decreaseTypeCounter(binding)
     val newB = new ServiceBinding(this, binding.bindType)
     addBinding(newB)
-    //increaseTypeCounter(newB)
     newB
   }
 

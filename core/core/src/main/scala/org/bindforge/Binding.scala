@@ -21,10 +21,10 @@ import com.google.inject.name.Names
 import org.osgi.framework.ServiceRegistration
 
 
-abstract class Binding[A <: Object](config: Config, val bindType: Class[A]) {
+abstract class Binding[A <: Object](val config: Config, val bindType: Class[A]) {
 
   var id: String = null
-
+  
   val keys = new LinkedHashSet[Key[_]]
   def mainKey = keys.toList.first
   def restKeys = if (keys.size == 0) List[Key[_]]() else keys.toList.tail
