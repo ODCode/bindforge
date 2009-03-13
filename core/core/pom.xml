@@ -5,7 +5,7 @@
     <artifactId>bindforge</artifactId>
     <packaging>jar</packaging>
     <name>bindforge - core</name>
-    <version>1.0.0</version>
+    <version>0.5.0</version>
     <parent>
         <groupId>org.bindforge</groupId>
         <artifactId>pom-bundle-scala</artifactId>

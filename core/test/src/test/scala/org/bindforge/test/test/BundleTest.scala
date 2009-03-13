@@ -32,7 +32,7 @@ import org.bindforge.common.integrationtest._
 @RunWith(classOf[JUnit4TestRunner])
 class BundleTest extends OSGiTest {
 
-  addBundle("org.bindforge", "bindforge", "1.0.0")
+  addBundle("org.bindforge", "bindforge", "0.5.0")
   addBundle("org.bindforge", "bindforge.testbundle", "1.0.0")
   addBundle("org.bindforge", "bindforge.common.util", "1.0.0")
 
