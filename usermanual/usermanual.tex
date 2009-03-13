@@ -1,0 +1,98 @@
+\documentclass[
+				a4paper,
+				chapterprefix,
+				appendixprefix,
+				normalheadings,
+				headsepline,
+				12pt,
+				DIV12,
+				oneside,
+				bibtotoc]
+				{scrbook}
+
+\usepackage{graphicx,hyperref,amssymb}
+
+% deutsch Umlaute für die Kommentare
+% \usepackage[latin1]{inputenc} 
+% \usepackage[T1]{fontenc} 
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+% 1 1/2 Zeilenabstand
+\usepackage{setspace}
+\onehalfspacing
+
+% Absatzeinstellungen
+\parindent 0pt
+\parskip 12pt
+
+\usepackage{sans}
+
+% FIX: avoid error about \chapter
+\let\endgraph\endgraf
+
+% Seitenraender
+\usepackage{vmargin}
+%% \setmarginsrb{leftmargin}{topmargin}{rightmargin}{bottommargin}%
+%%              {headheight}{headsep}{footheight}{footskip}
+% \setmarginsrb{2.5cm}{1.5cm}{2.5cm}{1.5cm}{7mm}{1.2cm}{4mm}{1.5cm}
+\setmarginsrb{2.5cm}{1.5cm}{2.5cm}{1.5cm}{7mm}{1.2cm}{4mm}{1.5cm}
+
+% Format fr Bildunterschriften
+\usepackage[format=hang,
+	    font={footnotesize,sf},
+	    labelfont={bf},
+	    margin=1cm,
+	    aboveskip=5pt,
+	    position=bottom]{caption}
+	    
+\usepackage{framed}
+
+\usepackage{color}
+\definecolor{lightgray}{rgb}{0.9,0.9,0.9} 
+
+\usepackage{listings}
+\lstset{numbers=none,
+	numberstyle=\footnotesize,
+	numbersep=5pt,
+	language=Java,
+	backgroundcolor=\color{lightgray}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\title{BindForge}
+
+% \subject{OSGi Module Framework}
+
+\author{OSGi Module Framework}
+
+\date{March 2009}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Titel
+\maketitle
+
+% TOC, figures, tables
+\tableofcontents
+% \listoffigures
+% \listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+\pagenumbering{arabic}
+
+\input{chapter1}
+
+\clearpage
+\pagenumbering{Alph}
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+
+\end{document}
+
