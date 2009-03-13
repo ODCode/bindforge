@@ -34,7 +34,9 @@ class ManagedServiceImpl(pid: String) extends ManagedService {
   def updated(dict: java.util.Dictionary[_, _]) {
     if (dict == null) return
     val config = mutable.HashMap.empty[String, Any]
-    dict.keys.foreach(k => config(k.asInstanceOf[String]) = dict.get(k))
+    javaEnumerationToIterator(dict.keys).foreach {k => 
+      config(k.asInstanceOf[String]) = dict.get(k)
+    }
     applyConfig(config.elements)
   }
 
@@ -93,7 +95,9 @@ object ManagedServiceStore {
         logger.debug("Creating ManagedService for PID [{}]", pid)
         val ms = new ManagedServiceImpl(pid)
         val map = Map("service.pid" -> pid)
-        val registration = context.registerService(classOf[ManagedService].getName, ms, map)
+        val registration = context.registerService(
+          classOf[ManagedService].getName, ms, mapToJavaDictionary(map))
+        
         registrations += registration
 
         ms

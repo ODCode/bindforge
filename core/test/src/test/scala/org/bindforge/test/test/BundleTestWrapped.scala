@@ -99,7 +99,9 @@ class BundleTestWrapped(context: BundleContext) extends Suite {
     var configureFired = false
     while (service.lastConfig == null) {
       if (!configureFired) {
-        conf.update(Map("username" -> "Joe", "password" -> "secret", "complex.var.name" -> "value"))
+        conf.update(mapToJavaDictionary(Map(
+            "username" -> "Joe", "password" -> "secret", "complex.var.name" -> "value"
+          )))
         configureFired = true
       }
       Thread.sleep(50)
