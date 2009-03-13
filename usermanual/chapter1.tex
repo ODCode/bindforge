@@ -11,4 +11,11 @@ Test abc def
 
 Test abc def
 
+\begin{lstlisting}
+bindings.filter(!_.isNestedBinding).foreach {b =>
+  if (sameTypeBindings.length == 0) b.keys += Key.get(b.bindType)
+}
+\end{lstlisting}
+
+
 
