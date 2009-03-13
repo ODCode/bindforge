@@ -98,7 +98,7 @@ class BundleTracker(context: BundleContext, bindforgeService: BindforgeService) 
     try {
       logger.info("Creating binding configuration for bundle [{}]", bundle.getSymbolicName)
       val scripts = bundle.findEntries(BINDFORGE_DIR, "*.scala", true).asInstanceOf[java.util.Enumeration[java.net.URL]]
-      val bfb = new BindforgeBundle(context.getBundle, bundle, scripts)
+      val bfb = new BindforgeBundle(context.getBundle, bundle, javaEnumerationToIterator(scripts))
       bfb.compile()
       val configClass = bfb.loadClass(getConfigHeader(bundle)).asInstanceOf[Class[Config]]
       val bindingConfig = configClass.newInstance
