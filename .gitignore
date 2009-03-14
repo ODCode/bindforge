@@ -6,4 +6,8 @@ target
 .launch
 .svn
 .DS_Store
+reference/output/*.aux
+reference/output/*.log
+reference/output/*.out
+
 
