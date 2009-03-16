@@ -8,7 +8,7 @@
 				DIV12,
 				oneside,
 				bibtotoc]
-				{scrbook}
+				{scrartcl}
 
 \usepackage{graphicx,hyperref,amssymb}
 
@@ -52,25 +52,111 @@
 \definecolor{lightgray}{rgb}{0.9,0.9,0.9} 
 
 \usepackage{listings}
-\lstset{numbers=none,
+\lstset{numbers=left,
 	numberstyle=\footnotesize,
 	numbersep=5pt,
 	language=Java,
+	captionpos=b,
+	basicstyle=\footnotesize,
+	frame=single,
 	backgroundcolor=\color{lightgray}}
+
+
+
+\def\blurb{%
+  }
+\def\clap#1{\hbox to 0pt{\hss #1\hss}}%
+\def\ligne#1{%
+  \hbox to \hsize{%
+    \vbox{\centering #1}}}%
+\def\haut#1#2#3{%
+  \hbox to \hsize{%
+    \rlap{\vtop{\raggedright #1}}%
+    \hss
+    \clap{\vtop{\centering #2}}%
+    \hss
+    \llap{\vtop{\raggedleft #3}}}}%
+\def\bas#1#2#3{%
+  \hbox to \hsize{%
+    \rlap{\vbox{\raggedright #1}}%
+    \hss
+    \clap{\vbox{\centering #2}}%
+    \hss
+    \llap{\vbox{\raggedleft #3}}}}%
+
+
+
+
+
+
+
+
+
 
 
 \begin{document}
 
 \title{BindForge}
 
-% \subject{OSGi Module Framework}
 
-\author{OSGi Module Framework}
 
-\date{March 2009}
+\subject{OSGi Module Framework}
+
+% \author{Roman Roelofsen}
+
+
+
+
+\date{\today}
 
 % Titel
-\maketitle
+% \maketitle
+
+
+
+
+
+\thispagestyle{empty}\vbox to .9\vsize{%
+  \vss
+  \vbox to 1\vsize{%
+    \haut{}{\blurb}{}
+    \vfill
+    \ligne{\begin{Huge}\textbf{BindForge}\end{Huge}}
+    \vspace{20mm}
+    \ligne{\Large Version 0.5}
+    \vspace{5mm}
+    \ligne{\Large Module Framework}
+    \vspace{5mm}
+    \ligne{\today}
+    \vfill
+    \ligne{%
+      \begin{tabular}{l}
+        Copyright\\
+      \end{tabular}}
+    \vspace{5mm}
+    \ligne{%
+      \begin{tabular}{l}
+        Roman Roelofsen \\
+      \end{tabular}
+      }
+    }%
+  \vss
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
 
 % TOC, figures, tables
 \tableofcontents

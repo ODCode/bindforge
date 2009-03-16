@@ -1,3 +1,4 @@
-\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
-\contentsline {section}{\numberline {1.1}Background}{1}{section.1.1}
-\contentsline {section}{\numberline {1.2}Problem Statement}{1}{section.1.2}
+\contentsline {section}{\numberline {1}What is BindForge?}{1}{section.1}
+\contentsline {section}{\numberline {2}Download}{1}{section.2}
+\contentsline {subsection}{\numberline {2.1}Maven Repository}{2}{subsection.2.1}
+\contentsline {section}{\numberline {3}Bundle Configuration}{2}{section.3}
