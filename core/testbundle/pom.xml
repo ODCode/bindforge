@@ -27,7 +27,7 @@
                 <configuration>
                     <instructions>
                         <Export-Package>org.bindforge.test.testbundle.*</Export-Package>
-                        <Bindforge-Config>org.bindforge.test.testbundle.Config</Bindforge-Config>
+                        <BindForge-Config>org.bindforge.test.testbundle.Config</BindForge-Config>
                     </instructions>
                 </configuration>
             </plugin>

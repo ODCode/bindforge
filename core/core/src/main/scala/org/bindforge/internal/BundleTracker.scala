@@ -33,7 +33,7 @@ class BundleTracker(context: BundleContext, bindforgeService: BindforgeService) 
   private var active = false
   
   val BINDFORGE_DIR = "OSGI-INF/bindforge/"
-  val BINDFORGE_HEADER = "Bindforge-Config"
+  val BINDFORGE_HEADER = "BindForge-Config"
   
   val trackedBundles = new HashSet[Bundle]()
 
