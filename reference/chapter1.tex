@@ -6,7 +6,9 @@ The mission of BindForge is to ease the OSGi development. BindForge provides sop
 BindForge relies on Guice for the dependency injection features. Unlike normally required when using Guice, BindForge users do not need to put special annotations in their classes (e.g. @Inject). Hence the Java classes are full POJOs again. At the same time, BindForge is 100\% compatible with Guice. All known features, e.g. Spring beans support, are available. For the OSGi service registry interaction, BindForge uses the Peaberry dynamic service extension. Additionally, BindForge completely abstracts from various OSGi elements. Without introducing code dependencies, users can fully utilise the OSGi service platform. 
 
 
-\section{Download}
+\section{Getting BindForge}
+
+\subsection{Direct Download}
 
 To use BindForge, you need to install 2 bundles in your OSGi framework:
 
@@ -47,9 +49,11 @@ After you configured the repository, you will need to add the artifact dependenc
 \end{lstlisting}
 
 
-\section{Bundle Configuration}
+\section{Creating a BindForge Configuration}
 
-To use BindForge, you need to put a configuration file in your bundle. Once your bundle gets started, BindForge will read this file to activate the configuration.\footnote{This behaviour is called \textit{Extender Pattern} and very common for OSGi frameworks. For example, the \textit{Declarative Services} specification uses the same mechanism.} A manifest entry in the bundle is used to specify the configuration file. Listing \ref{config_manifest} shows an example MANIFEST.MF.
+\subsection{Bundle Configuration}
+
+To use BindForge, you need to put a configuration file in your bundle. Once your bundle gets started, BindForge will read this file to activate the configuration.\footnote{This behavior is called \textit{Extender Pattern} and very common for OSGi frameworks. For example, the \textit{Declarative Services} specification uses the same mechanism.} A manifest entry in the bundle is used to specify the configuration file. Listing \ref{config_manifest} shows an example MANIFEST.MF.
 
 \begin{lstlisting}[caption={MANIFEST.MF with Configuration},label=config_manifest,language=Java]
 Bundle-ManifestVersion: 2
@@ -57,14 +61,125 @@ Bundle-SymbolicName: org.acme.yourapp
 BindForge-Config: org.acme.yourapp.Config
 \end{lstlisting}
 
-The header \verb!BindForge-Config! in line 3 specifies the configuration that should be used. As you can see in the example, the value has the form of \verb!packagename.ClassName!. BindForge configurations are full Java classes written in the Scala programming language\footnote{http://www.scala-lang.org}. There are 2 ways 
+In this example, the header \verb!BindForge-Config! in line 3 specifies the configuration that should be used. As you can see here, the value has the form of \verb!packagename.ClassName!. BindForge configurations are full Java classes written in the Scala programming language\footnote{http://www.scala-lang.org}. The programmer can choose between 2 options to create these configuration classes:
+
+\begin{description}
+ \item[Embedded scripts] During the bundle activation, BindForge will compile every \verb!*.scala! file in the folder \verb!/OSGI-INF/bindforge!. Unlike Java, Scala does not impose the restriction on the filename/path that is has to match the name/package of the class it defines. Therefore you can directly put a file, e.g. \verb!config.scala!, in the folder without the need to create several sub-directories, even if you want to "put" the configuration in a package.\footnote{It is generally a good idea to use the bundles top-level package as the package for the configuration. We will see later why this is useful.}
+
+This option should be used by Java programmers if they do not want to alter their build system and configuration.
+
+ \item[Compile during build process] If the primary language in the project is Scala, the build system will already be configured to use a Scala compiler. In this case the BindForge configuration can be compiled just like any other Scala source file in the project.
+
+This option can also be used in pure Java projects but requires the additional compilation of Scala files during the build process. The advantage is that the programmer will get a validation of the configuration file before deployment.
+\end{description}
+
+Regardless of which option you use, the manifest header only depends on the \verb!packagename! and \verb!ClassName! used for the configuration. 
+
+\subsection{Configuration File}
+
+Listing \ref{config_file_basic} shows a basic BindForge configuration file. The package and class name can be specified by the programmer and only need to match the name used in the bundle manifest header \verb!BindForge-Config!.
+
+\begin{lstlisting}[caption={BindForge configuration file},label=config_file_basic,language=Java]
+package com.acme.app
+
+class MyConfig extends org.bindforge.Config {
+  // configuration goes here
+}
+\end{lstlisting}
+
+As described earlier, it is generally a good idea to use the same package name for the configuration and for the normal application classes. That is because packages in Scala truly nest. For example, if your configuration is declared in package \verb!com.acme.app! and you want to reference the class \verb!com.acme.app.internal.MyService!, you can directly reference the class with \verb!internal.MyService!. Hence you do not need to repeat the package names if the configuration and referenced class have the same package root.
+
+\section{Dependency Injection}
+
+\subsection{Introduction}
+
+This section describes the dependency injection (DI) DSL.\footnote{Internally, BindForge uses Google Guice to provide the dependency injection features (http://google-guice.googlecode.com).}. In BindForge, the configuration is based around the concept of \textit{bindings}. A binding is created for a specific type to make BindForge aware of it. This binding can be used to map e.g. interfaces to specific implementations or to define dependencies that needs to be fulfilled by BindForge.
+
+\subsection{Basic Binding}
+
+Listing \ref{config_basic_binding_classes} shows 2 example interfaces and implementations that will later be configured and wired by BindForge. Here, \verb!BServiceImpl! depends on \verb!AService! and we want to use the method \verb!setAService! to inject an instance of \verb!AService!. We assume that all classes are defined in package \verb!org.example!.
+
+\begin{lstlisting}[caption={Example classes},label=config_basic_binding_classes,language=Java]
+interface AService {...}
+class AServiceImpl implements AService {...}
+
+interface BService {...}
+class BServiceImpl implements BService {
+    public void setAService(AService aService) {
+        // ...
+    }
+}
+\end{lstlisting}
+
+First, we need to bind both services to make BindForge aware of them (listing \ref{config_basic_binding1}). The \verb!bind! method is used to map the interface to the implementation. 
+
+\begin{lstlisting}[caption={Simple bindings},label=config_basic_binding1,language=Java]
+package org.example
+
+class MyFirstConfig extends org.bindforge.Config {
+    bind [AService, AServiceImpl]
+    bind [BService, BServiceImpl]
+}
+\end{lstlisting}
+
+This configuration causes BindForge to create an instance for each service implementation. 
+
+\subsection{Wiring by Type}
+
+To define the wiring between the 2 bindings we need to add a \textit{spec block} to the \verb!ServiceB! binding (listing \ref{config_basic_binding2}).
+
+\begin{lstlisting}[caption={Simple bindings},label=config_basic_binding2,language=Java]
+package org.example
+
+class MyFirstConfig extends org.bindforge.Config {
+    bind [AService, AServiceImpl]
+    bind [BService, BServiceImpl] spec {
+        property("aService")
+    }
+}
+\end{lstlisting}
+
+The \verb!property! method is used to define the properties that needs to be injected by BindForge. If the target class is written in Java, BindForge will use the JavaBeans notation to map the property name to the setter method. If the class is written in Scala, BindForge will use the \verb!propertyname_=! method\footnote{This method is always created by the Scala compiler if a field is declared as a 'var' member. This method will be used transparently if a value is assigned to the field, e.g. 'obj.field = value'.}. The method parameter type is used to determine the required dependency. In our example, the parameter is declared as an instance of \verb!AService!. In our configuration we created a binding for this type that mapped \verb!AService! to \verb'AServiceImpl'. Hence, BindForge will inject an instance of \verb!AServiceImpl!.
+
+\begin{description}
+ \item[Bindings and Singletons] By default, BindForge will create exactly one instance for each binding. This means that if we would inject \verb!AService! several times, BindForge would always use the same instance. Later versions of BindForge will allow to configure this behavior.
+\end{description}
+
+\subsection{Optional Interface Type}
+
+So far we always specified both the interface and implementation type for the bindings. However, if we do not depend on the interface we can leave out the first parameter of the \verb!bind! method. In our example, this applies to the \verb!ServiceBImpl! binding since no other binding depends on it. Listing \ref{config_basic_binding3} shows the updated version.
+
+\begin{lstlisting}[caption={Simple bindings},label=config_basic_binding3,language=Java]
+package org.example
+
+class MyFirstConfig extends org.bindforge.Config {
+    bind [AService, AServiceImpl]
+    bind [BServiceImpl] spec {
+        property("aService")
+    }
+}
+\end{lstlisting}
+
+\subsection{Wiring by ID}
 
 
-- tell bf about the config (manifest)
 
-- this point to class file, but you dont need to compile it (but you can)
 
-- dir in bundle, everything will get compiled
+
+
+\subsection{Injecting Values}
+
+
+
+
+
+
+
+\section{OSGi Service Registry}
+
+\subsection{Registering Services}
+
+\subsection{Accessing Services}
 
 
 

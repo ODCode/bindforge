@@ -1,4 +1,17 @@
 \contentsline {section}{\numberline {1}What is BindForge?}{1}{section.1}
-\contentsline {section}{\numberline {2}Download}{1}{section.2}
-\contentsline {subsection}{\numberline {2.1}Maven Repository}{2}{subsection.2.1}
-\contentsline {section}{\numberline {3}Bundle Configuration}{2}{section.3}
+\contentsline {section}{\numberline {2}Getting BindForge}{1}{section.2}
+\contentsline {subsection}{\numberline {2.1}Direct Download}{1}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Maven Repository}{2}{subsection.2.2}
+\contentsline {section}{\numberline {3}Creating a BindForge Configuration}{2}{section.3}
+\contentsline {subsection}{\numberline {3.1}Bundle Configuration}{2}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Configuration File}{3}{subsection.3.2}
+\contentsline {section}{\numberline {4}Dependency Injection}{4}{section.4}
+\contentsline {subsection}{\numberline {4.1}Introduction}{4}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Basic Binding}{4}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Wiring by Type}{5}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Optional Interface Type}{6}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}Wiring by ID}{7}{subsection.4.5}
+\contentsline {subsection}{\numberline {4.6}Injecting Values}{7}{subsection.4.6}
+\contentsline {section}{\numberline {5}OSGi Service Registry}{7}{section.5}
+\contentsline {subsection}{\numberline {5.1}Registering Services}{7}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Accessing Services}{7}{subsection.5.2}
