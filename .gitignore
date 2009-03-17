@@ -9,5 +9,9 @@ target
 reference/output/*.aux
 reference/output/*.log
 reference/output/*.out
+.tex~
+.tex.backup
+.swp
+
 
 
