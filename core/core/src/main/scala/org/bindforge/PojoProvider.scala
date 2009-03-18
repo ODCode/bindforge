@@ -71,17 +71,17 @@ class PropertyInjection(name: String, value: Any) extends InjectionPoint {
         // Skip the injection for now. Will happen in the callback.
         return
 
-        // if a symbol was used, use it as the ID
+      // if a symbol was used, use it as the ID
       case s: Symbol =>
         val key = Key.get(classOf[Object], Names.named(s.name))
         injector.getInstance(key)
 
-        // Lookup the value
+      // Lookup the value
       case InjectWithType =>
         injector.getInstance(paramType)
 
-        // Use the specified value
-      case _ => value.asInstanceOf[Object]
+      // Use the specified value
+      case _ => TypeConverter.convert(paramType, value.asInstanceOf[Object])
     }
 
     // inject the value

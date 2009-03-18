@@ -43,7 +43,8 @@ class ServiceWithProperties {
 
   var intp: Int = _
   var stringp: String = _
-  var listp: java.util.List[String] = _
+  
+  var javaList: java.util.List[String] = _
 
 }
 
