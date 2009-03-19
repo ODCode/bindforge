@@ -59,24 +59,6 @@ class SimpleModuleTest {
   }
 
   @Test
-  def testInjectValue() {
-    class SimpleModule extends Config {
-      bind [ServiceWithProperties] spec {
-        property("intp") = 123
-        property("stringp") = "abc"
-        property("listp") = new java.util.ArrayList[String]()
-      }
-    }
-    val i = InjectorFactory.createInjector(new SimpleModule)
-
-    val ser = i.getInstance(Key.get(classOf[ServiceWithProperties]))
-    assertTrue(ser != null)
-    assertTrue(ser.intp == 123)
-    assertTrue(ser.stringp == "abc")
-    assertTrue(ser.listp.isInstanceOf[java.util.ArrayList[_]])
-  }
-
-  @Test
   def testInjectionWithInjectAnnotation() {
     class SimpleModule extends Config {
       bind [MyService, MyServiceImpl]

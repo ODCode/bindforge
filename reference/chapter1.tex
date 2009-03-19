@@ -89,6 +89,7 @@ class MyConfig extends org.bindforge.Config {
 
 As described earlier, it is generally a good idea to use the same package name for the configuration and for the normal application classes. That is because packages in Scala truly nest. For example, if your configuration is declared in package \verb!com.acme.app! and you want to reference the class \verb!com.acme.app.internal.MyService!, you can directly reference the class with \verb!internal.MyService!. Hence you do not need to repeat the package names if the configuration and referenced class have the same package root.
 
+
 \section{Dependency Injection}
 
 \subsection{Introduction}
@@ -128,7 +129,7 @@ This configuration causes BindForge to create an instance for each service imple
 
 To define the wiring between the 2 bindings we need to add a \textit{spec block} to the \verb!ServiceB! binding (listing \ref{config_basic_binding2}).
 
-\begin{lstlisting}[caption={Simple bindings},label=config_basic_binding2,language=Java]
+\begin{lstlisting}[caption={Specify properties},label=config_basic_binding2,language=Java]
 package org.example
 
 class MyFirstConfig extends org.bindforge.Config {
@@ -149,7 +150,7 @@ The \verb!property! method is used to define the properties that needs to be inj
 
 So far we always specified both the interface and implementation type for the bindings. However, if we do not depend on the interface we can leave out the first parameter of the \verb!bind! method. In our example, this applies to the \verb!ServiceBImpl! binding since no other binding depends on it. Listing \ref{config_basic_binding3} shows the updated version.
 
-\begin{lstlisting}[caption={Simple bindings},label=config_basic_binding3,language=Java]
+\begin{lstlisting}[caption={Optional interface type},label=config_basic_binding3,language=Java]
 package org.example
 
 class MyFirstConfig extends org.bindforge.Config {
@@ -162,17 +163,37 @@ class MyFirstConfig extends org.bindforge.Config {
 
 \subsection{Wiring by ID}
 
+The last examples always used a \textit{wiring by type} where the parameter type of the setter method is used to determine the required type. However, if several bindings for a specific type exists, BindForge does not know how to select the instance that should be injected. Therefore the user can assign a unique ID to the bindings. Later, this ID can be used to explicitly refer to a binding. This ID is only required if the bindings are ambiguous and the user wants to refer to one specific binding. Listing \ref{config_basic_id} shows how to use this \textit{wiring by ID}.
 
+\begin{lstlisting}[caption={Bindings with ID},label=config_basic_id,language=Java]
+package org.example
 
+class MyFirstConfig extends org.bindforge.Config {
+    "myID" :: bind [AServiceImpl]
+    bind [BServiceImpl] spec {
+        property("aService") = ref("myID")
+    }
+}
+\end{lstlisting}
 
+Since the dependency for binding \verb!BServiceImpl! is now identified by the ID and not by the parameter type of the setter method, we can also leave out the interface type \verb!AService! in the first binding. If we would still specify it we could refer to the \verb!AService! by both the ID and type.
 
+\subsection{Primitive Types}
 
-\subsection{Injecting Values}
+Listing \ref{config_inject_primitive_types} shows how to inject simple values that are directly specified in the configuration file.
 
+\begin{lstlisting}[caption={Inject primitive types},label=config_inject_primitive_types,language=Java]
+class MyFirstConfig extends org.bindforge.Config {
+    bind [type] spec {
+        property("timeout") = 1000
+        property("username") = "joe"
+    }
+}
+\end{lstlisting}
 
+\subsection{Collections}
 
-
-
+\subsection{Lifecycle Callbacks}
 
 
 \section{OSGi Service Registry}
@@ -181,6 +202,8 @@ class MyFirstConfig extends org.bindforge.Config {
 
 \subsection{Accessing Services}
 
+
+\section{OSGi Configuration Admin}
 
 
 
