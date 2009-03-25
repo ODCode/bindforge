@@ -5,13 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>pom-bundle-scala</artifactId>
     <packaging>pom</packaging>
+    <name>bindforge - parent - bundle scala</name>
 
     <parent>
         <groupId>org.bindforge</groupId>
         <artifactId>pom-bundle</artifactId>
         <version>1.0.0</version>
-        <relativePath>./pom-bundle.xml</relativePath>
+        <relativePath>../bundle/pom.xml</relativePath>
     </parent>
+
+    <modules>
+    </modules>
 
     <dependencies>
         <dependency>

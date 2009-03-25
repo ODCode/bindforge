@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.bindforge</groupId>
-    <artifactId>bindforge-root</artifactId>
+    <artifactId>bindforge-example</artifactId>
     <name>bindforge</name>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <version>1.0.0</version>
 
     <licenses>
@@ -16,31 +16,20 @@
         </license>
     </licenses>
 
-    <modules>
-        <module>parent</module>
-        <module>common</module>
-        <module>core</module>
-        <module>assembly</module>
-    </modules>
-
-    <distributionManagement>
-        <repository>
-            <id>ssh-repository</id>
-            <url>scpexe://tuxed.de/var/www/web0/html/mvn</url>
-        </repository>
-    </distributionManagement>
-
-    <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>1.0-alpha-5</version>
-            </extension>
-        </extensions>
-    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.bindforge</groupId>
+            <artifactId>bindforge</artifactId>
+            <version>0.5.0</version>
+        </dependency>
+    </dependencies>
 
     <repositories>
+        <repository>
+            <id>tuxed</id>
+            <name>Tuxed.de</name>
+            <url>http://repository.tuxed.de/</url>
+        </repository>
         <repository>
             <id>apache.m2.incubator</id>
             <name>Apache M2 Incubator Repository</name>
@@ -96,3 +85,4 @@
     </pluginRepositories>
 
 </project>
+

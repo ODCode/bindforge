@@ -19,7 +19,7 @@ object TypeConverter {
   val JavaList = classOf[java.util.List[_]]
   val JavaMap = classOf[java.util.Map[_, _]]
 
-  def convert(targetType: Class[_], value: Object) = value match {
+  def convert(targetType: Class[_], value: Any): Any = value match {
     // From...
     // List...
     case from: List[_] => targetType match {
