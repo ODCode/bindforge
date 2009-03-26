@@ -193,21 +193,75 @@ class MyFirstConfig extends org.bindforge.Config {
 
 \subsection{Collections}
 
+TBD
+
 \subsection{Lifecycle Callbacks}
+
+(Description will follow)
+
+\begin{lstlisting}[caption={Lifecycle callbacks},label=lifecycle_callbacks,language=Java]
+class MyFirstConfig extends org.bindforge.Config {
+    bind [type] spec {
+	lifecycle("init", "destroy")
+    }
+}
+\end{lstlisting}
 
 
 \section{OSGi Service Registry}
 
 \subsection{Registering Services}
 
+\begin{lstlisting}[caption={Registering OSGi services},label=registering_osgi_services,language=Java]
+class MyFirstConfig extends org.bindforge.Config {
+    bind [type] spec {
+	exportService
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Registering OSGi services with properties},label=registering_osgi_services_with_services,language=Java]
+class MyFirstConfig extends org.bindforge.Config {
+    bind [type] spec {
+	exportService("key1" -> "value1", "key2" -> "value2")
+    }
+}
+\end{lstlisting}
+
+
 \subsection{Accessing Services}
+
+\begin{lstlisting}[caption={Using OSGi services},label=using_osgi_services,language=Java]
+class MyFirstConfig extends org.bindforge.Config {
+
+    bind [LogService] importService
+
+    bind [type] spec {
+	property("logService")
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Using OSGi services and LDAP filters},label=using_osgi_services_and_ldap,language=Java]
+class MyFirstConfig extends org.bindforge.Config {
+
+    bind [LogService] importService ("(key=value)")
+
+    bind [type] spec {
+	property("logService")
+    }
+}
+\end{lstlisting}
+
 
 
 \section{OSGi Configuration Admin}
 
-
-
-
-
-
+\begin{lstlisting}[caption={Using OSGi ConfigurationAdmin service},label=using_osgi_configurationadmin,language=Java]
+class MyFirstConfig extends org.bindforge.Config {
+    bind [type] spec {
+	config("myservice.pid")
+    }
+}
+\end{lstlisting}
 
